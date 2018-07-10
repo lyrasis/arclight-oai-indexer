@@ -5,9 +5,7 @@ BlackLight web app.
 
 ```bash
 bundle install
-docker-compose -f docker-compose-solr.yml build # images for indexer and solr
-
-# start local solr
+docker-compose -f docker-compose-solr.yml build
 docker-compose -f docker-compose-solr.yml run -p 8983:8983 -d solr
 
 # set env for index from url
