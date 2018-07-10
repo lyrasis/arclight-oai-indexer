@@ -1,0 +1,24 @@
+---
+version: '3'
+services:
+  indexer:
+    image: arclight/indexer
+    network_mode: "host"
+    build:
+      context: .
+      dockerfile: Dockerfile.indexer
+    environment:
+      REPOSITORY_FILE: ./config/repositories.yml
+      REPOSITORY_URL: https://raw.githubusercontent.com/sul-dlss/arclight/master/spec/fixtures/config/repositories.yml
+      REPOSITORY_ID: sample
+      SOLR_URL: http://127.0.0.1:8983/solr/arclight
+      URL: https://raw.githubusercontent.com/sul-dlss/arclight/master/spec/fixtures/ead/sample/large-components-list.xml
+      # FAD_URL: https://ka2v1g7ub2.execute-api.us-west-2.amazonaws.com
+      # FAD_ENV: dev
+      # FAD_TOKEN: abc123
+    command:
+      - bundle
+      - exec
+      - rake
+      - arclight:index_url
+      # - arclight:index_fad

@@ -5,9 +5,10 @@ BlackLight web app.
 
 ```bash
 bundle install
+docker-compose -f docker-compose-solr.yml build # images for indexer and solr
 
 # start local solr
-cd solr && docker-compose up -d && cd -
+docker-compose -f docker-compose-solr.yml run -p 8983:8983 -d solr
 
 # set env for index from url
 export REPOSITORY_FILE=./config/repositories.yml
@@ -18,6 +19,18 @@ export URL=https://raw.githubusercontent.com/sul-dlss/arclight/master/spec/fixtu
 # ingest the ead
 bundle exec rake arclight:index_url
 ```
+
+## Docker
+
+Run an indexer container with default index url task:
+
+```bash
+docker-compose -f docker-compose-solr.yml run -p 8983:8983 -d solr # if not running
+docker-compose -f docker-compose-indexer.yml build
+docker-compose -f docker-compose-indexer.yml run --rm indexer
+```
+
+See the `docker-compose-indexer.yml` for example configuration.
 
 ## Todo
 
