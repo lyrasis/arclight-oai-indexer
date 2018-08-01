@@ -1,0 +1,5 @@
+---
+Metrics/LineLength:
+  IgnoredPatterns:
+    - !ruby ^#
+    - !ruby ^\s*puts
