@@ -16,6 +16,7 @@ export URL=https://raw.githubusercontent.com/sul-dlss/arclight/master/spec/fixtu
 
 # ingest the ead
 bundle exec rake arclight:index_url
+bundle exec rake arclight:index_delete[lc0100]
 ```
 
 ## Docker

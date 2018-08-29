@@ -20,18 +20,10 @@ require 'benchmark'
 #
 # REPOSITORY_ID repository shortname (default: demo).
 #
-
 namespace :arclight do
   desc 'Index resources via a FAD API endpoint'
   task :index_fad do
-    config = {
-      token: ENV['FAD_TOKEN'],
-      url: ENV['FAD_URL'],
-      env: ENV['FAD_ENV'],
-      site: ENV['REPOSITORY_ID'],
-      solr_url: ENV['SOLR_URL']
-    }
-
+    config = get_config
     # TODO: -
     # *. sync config/repositories.yml using ENV.fetch('REPOSITORY_URL')
     # *. check ENV.fetch('REPOSITORY_ID') is valid (is in list of repos)
@@ -67,6 +59,16 @@ namespace :arclight do
     parse_url(url)
   end
 
+  def get_config
+    {
+      token: ENV['FAD_TOKEN'],
+      url: ENV['FAD_URL'],
+      env: ENV['FAD_ENV'],
+      site: ENV['REPOSITORY_ID'],
+      solr_url: ENV['SOLR_URL']
+    }
+  end
+
   def get_list(config, since = 0)
     HTTP['x-api-key' => config[:token]]
       .get(construct_list_endpoint(config, since))
@@ -91,9 +93,8 @@ namespace :arclight do
 
   def delete_coll(coll)
     begin
-      ENV['coll'] = coll
-      Rake::Task['arclight:index_fad_delete'].invoke
-      Rake::Task['arclight:index_fad_delete'].reenable
+      Rake::Task['arclight:index_delete'].invoke(coll)
+      Rake::Task['arclight:index_delete'].reenable
     rescue StandardError => e
       puts "Error: #{e}"
     end
@@ -138,16 +139,24 @@ namespace :arclight do
     eadid.content = identifier
   end
 
-  desc 'Delete resources'
-  task :index_fad_delete do
-    config = {
-      solr_url: ENV['SOLR_URL']
-    }
-    raise 'No collections marked for deletion' unless ENV['coll']
-    print "Deleting #{ENV['coll']} ...\n"
+  desc 'Delete a resource'
+  task :index_delete, [:coll] do |t, args|
+    config = get_config
+    coll   = args[:coll]
+
+    raise 'No collection marked for deletion' unless coll
+    print "Deleting #{coll} ...\n"
+
     solr = RSolr.connect :url => config[:solr_url]
-    elapsed_time = Benchmark.realtime { solr.get('select', :params => {:q=>"ead_ssi:#{RSolr.solr_escape(ENV['coll'])}"}) !=[] ? solr.delete_by_query("ead_ssi:#{RSolr.solr_escape(ENV['coll'])}") : next }
+    elapsed_time = Benchmark.realtime do
+      solr.get(
+        'select',
+        params: {
+          q: solr.delete_by_query("ead_ssi:#{RSolr.solr_escape(coll)}")
+        }
+      )
+    end
     solr.commit
-    print "Deleted #{ENV['coll']} (in #{elapsed_time.round(3)} secs).\n"
+    print "Deleted #{coll} (in #{elapsed_time.round(3)} secs).\n"
   end
 end
