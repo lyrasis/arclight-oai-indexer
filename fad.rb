@@ -4,6 +4,8 @@ require 'http'
 require 'uri'
 require 'yaml'
 require 'nokogiri'
+require 'rsolr'
+require 'benchmark'
 
 ##
 # Environment variables for indexing (c.f. index.rb):
@@ -26,7 +28,8 @@ namespace :arclight do
       token: ENV['FAD_TOKEN'],
       url: ENV['FAD_URL'],
       env: ENV['FAD_ENV'],
-      site: ENV['REPOSITORY_ID']
+      site: ENV['REPOSITORY_ID'],
+      solr_url: ENV['SOLR_URL']
     }
 
     # TODO: -
@@ -75,7 +78,25 @@ namespace :arclight do
   end
 
   def handle_deletes(config, deletes)
-    # TODO: delete stuff
+    deletes.each do |item|
+      item_url = RSolr.solr_escape(item['url'])
+      solr = RSolr.connect :url => config[:solr_url]
+      results = solr.get 'select', :params => {:q=>"ead_ssi:#{item_url}"}
+      unless results['response']['docs'] == []
+        delete_uri = results['response']['docs'][0]['ead_ssi']
+        delete_coll(delete_uri)
+      end
+    end
+  end
+
+  def delete_coll(coll)
+    begin
+      ENV['coll'] = coll
+      Rake::Task['arclight:index_fad_delete'].invoke
+      Rake::Task['arclight:index_fad_delete'].reenable
+    rescue StandardError => e
+      puts "Error: #{e}"
+    end
   end
 
   def handle_updates(config, updates)
@@ -119,9 +140,14 @@ namespace :arclight do
 
   desc 'Delete resources'
   task :index_fad_delete do
-    # JSON only provides the url and deleted/not, so need to find reliable way
-    # to identify what exactly in arclight-index needs to be deleted.
-    # solr.delete_by_query('*:*')
-    # solr.commit
+    config = {
+      solr_url: ENV['SOLR_URL']
+    }
+    raise 'No collections marked for deletion' unless ENV['coll']
+    print "Deleting #{ENV['coll']} ...\n"
+    solr = RSolr.connect :url => config[:solr_url]
+    elapsed_time = Benchmark.realtime { solr.get('select', :params => {:q=>"ead_ssi:#{RSolr.solr_escape(ENV['coll'])}"}) !=[] ? solr.delete_by_query("ead_ssi:#{RSolr.solr_escape(ENV['coll'])}") : next }
+    solr.commit
+    print "Deleted #{ENV['coll']} (in #{elapsed_time.round(3)} secs).\n"
   end
 end
