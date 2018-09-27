@@ -8,9 +8,9 @@ services:
       context: .
       dockerfile: Dockerfile.indexer
     environment:
-      FAD_URL: https://ka2v1g7ub2.execute-api.us-west-2.amazonaws.com
       FAD_ENV: dev
-      FAD_TOKEN: abc123
+      FAD_TOKEN: YyC3urekxQ97206cfyn2Q9KqYcskC9Gf2KiPKuxn
+      FAD_URL: https://4yz5ykcgq8.execute-api.us-west-2.amazonaws.com
       REPOSITORY_ID: sample
       REPOSITORY_URL: https://raw.githubusercontent.com/sul-dlss/arclight/master/spec/fixtures/config/repositories.yml
       SOLR_URL: http://127.0.0.1:8983/solr/arclight

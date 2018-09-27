@@ -9,7 +9,7 @@ docker-compose -f docker-compose-solr.yml build
 docker-compose -f docker-compose-solr.yml run -p 8983:8983 -d solr
 
 # override .env (create: .env.local) to customize configuration
-bundle exec rake arclight:index_url
+bundle exec rake arclight:index_url # c.f. URL=...
 bundle exec rake arclight:delete_by_eadid[lc0100]
 bundle exec rake arclight:fad:index
 ```
@@ -26,8 +26,4 @@ docker-compose -f docker-compose-indexer.yml run --rm indexer
 
 See the `docker-compose-indexer.yml` for example configuration.
 
-## Todo
-
-- Dockerfile
-- Download repositories configuration option
-- Rake task to index from FAD
+---

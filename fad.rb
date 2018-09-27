@@ -14,9 +14,9 @@ require_relative 'lib/fad/client'
 
 ##
 # Environment variables for indexing (c.f. index.rb):
-# FAD_URL base url to FAD api endpoint (default: none).
 # FAD_ENV the deployment stage of the api (default: none).
 # FAD_TOKEN access token (default: none).
+# FAD_URL base url to FAD api endpoint (default: none).
 # REPOSITORY_URL url to repositories.yml (default: none).
 # REPOSITORY_ID repository shortname (default: demo).
 #
