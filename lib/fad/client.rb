@@ -4,13 +4,14 @@ module FAD
 
     attr_reader :config, :indexer, :solr
 
-    def self.get_config
+    def self.get_config(restricted: false)
       {
+        env: ENV['FAD_ENV'],
+        restricted: restricted,
         token: ENV['FAD_TOKEN'],
         url: ENV['FAD_URL'],
-        env: ENV['FAD_ENV'],
         site: ENV['REPOSITORY_ID'],
-        solr_url: ENV['SOLR_URL']
+        solr_url: ENV['SOLR_URL'],
       }
     end
 
@@ -73,6 +74,15 @@ module FAD
       end
     end
 
+    def download(url: nil, restricted: false)
+      if restricted
+        HTTP['x-api-key' => config[:token]]
+          .get(construct_resource_endpoint(url: url))
+      else
+        HTTP.get(url)
+      end
+    end
+
     def index(file: nil)
       Benchmark.realtime do
         indexer.update(file)
@@ -84,16 +94,11 @@ module FAD
         .get(construct_list_endpoint(since: since))
     end
 
-    def record(url: nil)
-      HTTP['x-api-key' => config[:token]]
-        .get(construct_resource_endpoint(url: url))
-    end
-
     def update(records: [])
       elapsed_time = 0
       records.each do |record|
         record_url = record['url']
-        ead = Nokogiri::XML(record(url: record_url).body)
+        ead = Nokogiri::XML(download(url: record_url, restricted: config[:restricted]).body)
         update_eadid(ead, record_url)
         elapsed_time += index(file: write_to_file(content: ead))
       end

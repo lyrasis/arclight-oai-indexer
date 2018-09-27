@@ -41,8 +41,11 @@ namespace :arclight do
       # TODO: -
       # *. sync config/repositories.yml using ENV.fetch('REPOSITORY_URL')
       # *. check ENV.fetch('REPOSITORY_ID') is valid (is in list of repos)
+      # *. check whether use token is true
+      site = { name: 'Demo Repository', restricted: true }
+      restricted = site[:restricted] ? true : false
 
-      fad = FAD::Client.new(config: FAD::Client.get_config)
+      fad = FAD::Client.new(config: FAD::Client.get_config(restricted))
       response = fad.records(since: 0)
 
       deletes, updates = response.parse['items'].partition do |i|
@@ -61,7 +64,7 @@ namespace :arclight do
       url = args[:url] ||= raise 'No url specified for indexing'
       fad = FAD::Client.new(config: FAD::Client.get_config)
       elapsed_time = fad.index(
-        file: fad.write_to_file(content: HTTP.get(url).body)
+        file: fad.write_to_file(content: fad.download(url: url).body)
       )
       puts "Indexed #{url} in #{elapsed_time.round(3)} secs."
     end

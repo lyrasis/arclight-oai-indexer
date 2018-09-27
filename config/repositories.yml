@@ -14,4 +14,4 @@ demo:
   thumbnail_url: 'http://example.com/thumbnail_ABC.jpg'
   google_request_url: 'https://docs.google.com/abc123'
   google_request_mappings: 'collection_name=abc&eadid=123'
-  use_token: true
+  restricted: true
