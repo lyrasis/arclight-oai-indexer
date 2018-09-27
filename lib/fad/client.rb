@@ -33,24 +33,24 @@ module FAD
     end
 
     def construct_list_endpoint(since: 0)
-      url = File.join(
+      construct_url = File.join(
         config[:url],
         config[:env],
         config[:site],
         "resources?since=#{since}"
       )
-      parse_url(url)
+      parse_url(construct_url)
     end
 
-    def construct_resource_endpoint(record_url: nil)
-      url = File.join(
+    def construct_resource_endpoint(url: nil)
+      construct_url = File.join(
         config[:url],
         config[:env],
         config[:site],
         'resources',
-        "find?url=#{record_url}"
+        "find?url=#{url}"
       )
-      parse_url(url)
+      parse_url(construct_url)
     end
 
     def delete(records: [])
@@ -86,7 +86,7 @@ module FAD
 
     def record(url: nil)
       HTTP['x-api-key' => config[:token]]
-        .get(construct_resource_endpoint(url: record_url))
+        .get(construct_resource_endpoint(url: url))
     end
 
     def update(records: [])
@@ -95,7 +95,7 @@ module FAD
         record_url = record['url']
         ead = Nokogiri::XML(record(url: record_url).body)
         update_eadid(ead, record_url)
-        elapsed_time += index(write_to_file(content: ead))
+        elapsed_time += index(file: write_to_file(content: ead))
       end
       elapsed_time
     end
@@ -125,7 +125,7 @@ module FAD
       RSolr.solr_escape(string)
     end
 
-    def update_eadid(xml, eadid)
+    def update_eadid(xml, identifier)
       eadid = xml.at_css 'eadid'
       eadid.content = identifier
     end
