@@ -8,15 +8,10 @@ bundle install
 docker-compose -f docker-compose-solr.yml build
 docker-compose -f docker-compose-solr.yml run -p 8983:8983 -d solr
 
-# set env for index from url
-export REPOSITORY_FILE=./config/repositories.yml
-export REPOSITORY_ID=demo
-export SOLR_URL=http://127.0.0.1:8983/solr/arclight
-export URL=https://raw.githubusercontent.com/sul-dlss/arclight/master/spec/fixtures/ead/sample/large-components-list.xml
-
-# ingest the ead
+# override .env (create: .env.local) to customize configuration
 bundle exec rake arclight:index_url
-bundle exec rake arclight:index_delete[lc0100]
+bundle exec rake arclight:delete_by_eadid[lc0100]
+bundle exec rake arclight:fad:index
 ```
 
 ## Docker

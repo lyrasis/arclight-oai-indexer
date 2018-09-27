@@ -2,6 +2,7 @@
 
 require 'arclight'
 require 'benchmark'
+require 'dotenv/load'
 require 'http'
 require 'nokogiri'
 require 'rsolr'
