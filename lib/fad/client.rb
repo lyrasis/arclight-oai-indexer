@@ -44,13 +44,15 @@ module FAD
     end
 
     def delete(records: [])
+      elapsed_time = 0
       records.each do |record|
-        destroy(eadid: record['url'])
+        elapsed_time += destroy(eadid: record['url'])
       end
+      elapsed_time
     end
 
     def destroy(eadid: nil)
-      elapsed_time = Benchmark.realtime do
+      Benchmark.realtime do
         solr.get(
           'select',
           params: {
@@ -59,12 +61,12 @@ module FAD
         )
         solr.commit
       end
-      print "Deleted #{eadid} (in #{elapsed_time.round(3)} secs).\n"
     end
 
     def index(file: nil)
-      elapsed_time = Benchmark.realtime { indexer.update(file) }
-      print "Indexed #{ENV['FILE']} (in #{elapsed_time.round(3)} secs).\n"
+      Benchmark.realtime do
+        indexer.update(file)
+      end
     end
 
     def records(since: 0)
@@ -78,6 +80,7 @@ module FAD
     end
 
     def update(records: [])
+      elapsed_time = 0
       records.each do |record|
         record_url = record['url']
         resource = record(url: record_url)
@@ -85,8 +88,9 @@ module FAD
         update_eadid(ead, record_url)
         file = File.join(Dir.tmpdir, 'fad.xml')
         File.open(f, 'w') { |f| f.write(ead) }
-        index(file)
+        elapsed_time += index(file)
       end
+      elapsed_time
     end
 
     private

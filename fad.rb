@@ -34,8 +34,21 @@ namespace :arclight do
       i['deleted'] == 'true'
     end
 
-    fad.delete(records: deletes)
-    fad.update(records: updates)
+    elapsed_time = fad.delete(records: deletes)
+    puts "Deleted #{deletes.count} records in #{elapsed_time.round(3)} secs."
+
+    elapsed_time = fad.update(records: updates)
+    puts "Indexed #{updates.count} records in #{elapsed_time.round(3)} secs."
+  end
+
+  desc 'Delete a resource'
+  task :index_delete, [:eadid] do |t, args|
+    eadid = args[:eadid]
+    raise 'No eadid marked for deletion' unless eadid
+
+    fad = FAD::Client.new(get_config)
+    elapsed_time = fad.destroy(eadid: eadid)
+    puts "Delete query for #{eadid} completed in #{elapsed_time.round(3)} secs."
   end
 
   def get_config
@@ -46,14 +59,5 @@ namespace :arclight do
       site: ENV['REPOSITORY_ID'],
       solr_url: ENV['SOLR_URL']
     }
-  end
-
-  desc 'Delete a resource'
-  task :index_delete, [:eadid] do |t, args|
-    eadid = args[:eadid]
-    raise 'No eadid marked for deletion' unless eadid
-
-    fad = FAD::Client.new(get_config)
-    fad.destroy(eadid: eadid)
   end
 end
