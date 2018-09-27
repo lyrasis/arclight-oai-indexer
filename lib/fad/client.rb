@@ -4,6 +4,16 @@ module FAD
 
     attr_reader :config, :indexer, :solr
 
+    def self.get_config
+      {
+        token: ENV['FAD_TOKEN'],
+        url: ENV['FAD_URL'],
+        env: ENV['FAD_ENV'],
+        site: ENV['REPOSITORY_ID'],
+        solr_url: ENV['SOLR_URL']
+      }
+    end
+
     def initialize(config: {}, options: {})
       @config = {
         token: nil,
