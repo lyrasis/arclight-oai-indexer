@@ -1,4 +1,4 @@
-# ArcLight Indexer
+# FAD Indexer
 
 Ingest EAD documents into Solr using the ArcLight Indexer decoupled from the
 BlackLight web app.
