@@ -93,14 +93,17 @@ module FAD
       elapsed_time = 0
       records.each do |record|
         record_url = record['url']
-        resource = record(url: record_url)
-        ead = Nokogiri::XML(resource.body)
+        ead = Nokogiri::XML(record(url: record_url).body)
         update_eadid(ead, record_url)
-        file = File.join(Dir.tmpdir, 'fad.xml')
-        File.open(f, 'w') { |f| f.write(ead) }
-        elapsed_time += index(file)
+        elapsed_time += index(write_to_file(content: ead))
       end
       elapsed_time
+    end
+
+    def write_to_file(filename: 'fad.xml', content: nil)
+      file = File.join(Dir.tmpdir, filename)
+      File.open(file, 'w') { |f| f.write(content) }
+      file
     end
 
     private
