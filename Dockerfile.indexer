@@ -24,4 +24,4 @@ COPY Gemfile* /usr/app/
 RUN bundle install && wget -O $REPOSITORY_FILE $REPOSITORY_URL
 
 COPY . /usr/app/
-CMD ["bundle", "exec", "rake", "arclight:index:fad"]
+CMD ["bundle", "exec", "rake", "arclight:fad:index_api"]

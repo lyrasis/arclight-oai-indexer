@@ -18,4 +18,4 @@ services:
       - bundle
       - exec
       - rake
-      - arclight:index:fad
+      - arclight:fad:index_api

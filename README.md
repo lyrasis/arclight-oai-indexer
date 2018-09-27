@@ -9,9 +9,10 @@ docker-compose -f docker-compose-solr.yml build
 docker-compose -f docker-compose-solr.yml run -p 8983:8983 -d solr
 
 # override .env (create: .env.local) to customize configuration
-bundle exec rake arclight:index_url # c.f. URL=...
-bundle exec rake arclight:delete_by_eadid[lc0100]
-bundle exec rake arclight:fad:index
+source .env # sets $URL
+bundle exec rake arclight:fad:index_url[$URL]
+bundle exec rake arclight:fad:delete[lc0100]
+bundle exec rake arclight:fad:index_api
 ```
 
 ## Docker
