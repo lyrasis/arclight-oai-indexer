@@ -1,4 +1,0 @@
-fad:
-  url: ENV.fetch('FAD_URL')
-  env: ENV.fetch('FAD_ENV', 'dev')
-  token: ENV.fetch('FAD_TOKEN') # used to access endpoint for auth reqs, include in hdr
