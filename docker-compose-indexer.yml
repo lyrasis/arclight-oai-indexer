@@ -12,7 +12,7 @@ services:
       FAD_TOKEN: YyC3urekxQ97206cfyn2Q9KqYcskC9Gf2KiPKuxn
       FAD_URL: https://4yz5ykcgq8.execute-api.us-west-2.amazonaws.com
       REPOSITORY_ID: sample
-      REPOSITORY_URL: https://raw.githubusercontent.com/sul-dlss/arclight/master/spec/fixtures/config/repositories.yml
+      REPOSITORY_URL: https://gist.githubusercontent.com/mark-cooper/5eb535fc7ee94ca2ac3951f3a386ccaa/raw/ae8b2a037ce284ce34b2f68c91d3625e8a15c63f/repositories.yml
       SOLR_URL: http://127.0.0.1:8983/solr/arclight
     command:
       - bundle
