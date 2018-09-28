@@ -30,4 +30,16 @@ Solr: http://localhost:8984/
 
 See the `docker-compose-indexer.yml` for example configuration.
 
+## ArcLight
+
+To test with a local ArcLight download it then:
+
+```bash
+bundle install
+bundle exec rake arclight:generate
+cd .internal_test_app
+# update config/repositories.yml
+SOLR_URL=http://localhost:8984/solr/arclight ./bin/rails s
+```
+
 ---
