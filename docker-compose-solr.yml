@@ -12,4 +12,4 @@ services:
       - docker-entrypoint.sh
       - solr-precreate
       - arclight
-      - /opt/solr/arclight/solr/conf
+      - /opt/solr/server/solr/configsets/arclight
