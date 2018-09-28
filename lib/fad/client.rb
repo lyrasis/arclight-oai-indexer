@@ -47,7 +47,7 @@ module FAD
         document: Arclight::CustomDocument,
         component: Arclight::CustomComponent
       }.merge(options)
-      @indexer = Arclight::Indexer.new(options)
+      @indexer = Arclight::Indexer.new(@options)
 
       @solr = RSolr.connect(url: config[:solr_url]) # TODO: move
     end
