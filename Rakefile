@@ -23,6 +23,10 @@ require_relative 'lib/fad/client'
 
 namespace :arclight do
   namespace :fad do
+    def yesterday_ts
+      (Time.now - (3600 * 24)).to_i
+    end
+
     desc 'Print FAD config'
     task :config do
       puts JSON.pretty_generate FAD::Client.get_config
@@ -37,9 +41,10 @@ namespace :arclight do
     end
 
     desc 'Index resources via a FAD API endpoint'
-    task :index_api do
+    task :index_api, [:since] do |t, args|
+      since = args[:since] ||= yesterday_ts
       fad = FAD::Client.new(config: FAD::Client.setup)
-      response = fad.records(since: 0)
+      response = fad.records(since: since)
 
       deletes, updates = response.parse['items'].partition do |i|
         i['deleted'] == 'true'
