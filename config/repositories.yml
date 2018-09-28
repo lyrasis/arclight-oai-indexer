@@ -11,7 +11,7 @@ demo:
   country: 'My Country'
   phone: '123-456-7890'
   contact_info: 'My Contact Info'
-  thumbnail_url: 'http://example.com/thumbnail_ABC.jpg'
+  thumbnail_url: 'https://www.lyrasis.org/SiteAssets/lyrasis.png'
   google_request_url: 'https://docs.google.com/abc123'
   google_request_mappings: 'collection_name=abc&eadid=123'
   restricted: true
