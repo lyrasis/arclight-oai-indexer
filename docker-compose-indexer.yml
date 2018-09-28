@@ -8,7 +8,7 @@ services:
       dockerfile: Dockerfile.indexer
     depends_on:
       - solr_indexer
-    restart: always
+    restart: on-failure
     environment:
       FAD_ENV: dev
       FAD_TOKEN: YyC3urekxQ97206cfyn2Q9KqYcskC9Gf2KiPKuxn
