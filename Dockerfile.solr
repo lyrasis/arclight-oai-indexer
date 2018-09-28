@@ -1,4 +1,4 @@
-FROM solr:7.4
+FROM solr:7.5
 LABEL maintainer="mark.cooper@lyrasis.org"
 
 RUN cd /opt/solr && \
