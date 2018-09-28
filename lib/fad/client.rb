@@ -15,6 +15,25 @@ module FAD
       }
     end
 
+    def self.repositories
+      YAML.load(File.open(ENV['REPOSITORY_FILE']))
+    end
+
+    def self.refresh_repositories
+      File.open(ENV['REPOSITORY_FILE'], 'w') do |f|
+        f.write(HTTP.get(ENV['REPOSITORY_URL']).body)
+      end
+    end
+
+    def self.setup
+      self.refresh_repositories
+      config = self.get_config
+      site = self.repositories.fetch(config[:site], nil)
+      raise "Invalid REPOSITORY_ID: #{config[:site]}!" unless site
+      config[:restricted] = site["restricted"] ? true : false
+      config
+    end
+
     def initialize(config: {}, options: {})
       @config = {
         token: nil,

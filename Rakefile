@@ -38,14 +38,7 @@ namespace :arclight do
 
     desc 'Index resources via a FAD API endpoint'
     task :index_api do
-      # TODO: -
-      # *. sync config/repositories.yml using ENV.fetch('REPOSITORY_URL')
-      # *. check ENV.fetch('REPOSITORY_ID') is valid (is in list of repos)
-      # *. check whether use token is true
-      site = { name: 'Demo Repository', restricted: true }
-      restricted = site[:restricted] ? true : false
-
-      fad = FAD::Client.new(config: FAD::Client.get_config(restricted))
+      fad = FAD::Client.new(config: FAD::Client.setup)
       response = fad.records(since: 0)
 
       deletes, updates = response.parse['items'].partition do |i|
