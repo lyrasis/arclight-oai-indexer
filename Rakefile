@@ -24,7 +24,7 @@ require_relative 'lib/fad/client'
 namespace :arclight do
   namespace :fad do
     def yesterday_ts
-      (Time.now - (3600 * 24)).to_i
+      (Time.now.utc - (3600 * 24)).to_i
     end
 
     desc 'Print FAD config'
@@ -34,7 +34,8 @@ namespace :arclight do
 
     desc 'Delete a resource by eadid'
     task :delete, [:eadid] do |t, args|
-      eadid = args[:eadid] ||= raise 'No eadid marked for deletion'
+      eadid = args[:eadid]
+      raise 'No eadid marked for deletion' unless eadid
       fad = FAD::Client.new(config: FAD::Client.get_config)
       elapsed_time = fad.destroy(eadid: eadid)
       puts "Delete query for #{eadid} completed in #{elapsed_time.round(3)} secs."
@@ -59,7 +60,8 @@ namespace :arclight do
 
     desc 'Index a resource via a url'
     task :index_url, [:url] do |t, args|
-      url = args[:url] ||= raise 'No url specified for indexing'
+      url = args[:url]
+      raise 'No url specified for indexing' unless url
       fad = FAD::Client.new(config: FAD::Client.get_config)
       elapsed_time = fad.index(
         file: fad.write_to_file(content: fad.download(url: url).body)
