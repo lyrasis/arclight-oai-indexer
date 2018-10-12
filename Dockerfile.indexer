@@ -5,12 +5,7 @@ ENV RUBY_PACKAGES ruby ruby-io-console ruby-irb ruby-json libffi-dev zlib-dev ru
 ENV TERM=linux
 ENV PS1 "\n\n>> ruby \W \$ "
 
-ENV FAD_ENV=dev \
-    FAD_TOKEN=YyC3urekxQ97206cfyn2Q9KqYcskC9Gf2KiPKuxn \
-    FAD_URL=https://4yz5ykcgq8.execute-api.us-west-2.amazonaws.com \
-    REPOSITORY_FILE=./config/repositories.yml \
-    REPOSITORY_URL=https://gist.githubusercontent.com/mark-cooper/5eb535fc7ee94ca2ac3951f3a386ccaa/raw/repositories.yml \
-    REPOSITORY_ID=sample \
+ENV OAI_ENDPOINT=https://archivesspace.lyrasistechnology.org/oai \
     SOLR_URL=http://127.0.0.1:8983/solr/arclight
 
 RUN apk --no-cache add $BUILD_PACKAGES $RUBY_PACKAGES && \
@@ -21,7 +16,7 @@ RUN mkdir -p /usr/app/config
 WORKDIR /usr/app
 
 COPY Gemfile* /usr/app/
-RUN bundle install && wget -O $REPOSITORY_FILE $REPOSITORY_URL
+RUN bundle install
 
 COPY . /usr/app/
-CMD ["bundle", "exec", "rake", "arclight:fad:index_api"]
+CMD ["bundle", "exec", "rake", "arclight:oai:index"]

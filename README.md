@@ -1,6 +1,6 @@
-# FAD Indexer
+# ArcLight OAI Indexer
 
-Ingest EAD documents into Solr using the ArcLight Indexer decoupled from the
+Ingest OAI EAD documents into Solr using the ArcLight Indexer decoupled from the
 BlackLight web app.
 
 ```bash
@@ -10,9 +10,9 @@ docker-compose -f docker-compose-solr.yml up -d
 
 # override .env (create: .env.local) to customize configuration
 source .env # sets $URL
-bundle exec rake arclight:fad:index_url[$URL]
-bundle exec rake arclight:fad:delete[lc0100]
-bundle exec rake arclight:fad:index_api[0]
+bundle exec rake arclight:http:index[$URL]
+bundle exec rake arclight:solr:delete[a0011.xml]
+bundle exec rake arclight:oai:index
 ```
 
 Solr: http://localhost:8983/

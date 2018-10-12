@@ -75,6 +75,8 @@ GEM
     erubi (1.7.1)
     faraday (0.15.3)
       multipart-post (>= 1.2, < 3)
+    faraday_middleware (0.12.2)
+      faraday (>= 0.7.4, < 1.0)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
     http (3.3.0)
@@ -127,6 +129,10 @@ GEM
       mini_portile2 (~> 2.3.0)
     nokogumbo (1.5.0)
       nokogiri
+    oai (0.4.0)
+      builder (>= 3.1.0)
+      faraday
+      faraday_middleware
     om (3.1.1)
       activemodel
       activesupport
@@ -223,6 +229,7 @@ DEPENDENCIES
   arclight
   dotenv
   http
+  oai
   rake
   rubocop
 

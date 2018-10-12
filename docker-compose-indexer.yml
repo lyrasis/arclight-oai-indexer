@@ -10,17 +10,12 @@ services:
       - solr_indexer
     restart: on-failure
     environment:
-      FAD_ENV: dev
-      FAD_TOKEN: YyC3urekxQ97206cfyn2Q9KqYcskC9Gf2KiPKuxn
-      FAD_URL: https://4yz5ykcgq8.execute-api.us-west-2.amazonaws.com
-      REPOSITORY_ID: demo
-      REPOSITORY_URL: https://gist.githubusercontent.com/mark-cooper/5eb535fc7ee94ca2ac3951f3a386ccaa/raw/repositories.yml
       SOLR_URL: http://solr_indexer:8983/solr/arclight
     command:
       - bundle
       - exec
       - rake
-      - arclight:fad:index_api[0]
+      - arclight:oai:index
   solr_indexer:
     image: arclight/solr
     build:
