@@ -3,6 +3,7 @@
 require 'arclight'
 require 'benchmark'
 require 'dotenv/load'
+require 'fieldhand'
 require 'http'
 require 'nokogiri'
 require 'rsolr'
@@ -10,62 +11,77 @@ require 'tmpdir'
 require 'uri'
 require 'yaml'
 
-require_relative 'lib/fad/client'
-
-##
-# Environment variables for indexing (c.f. index.rb):
-# FAD_ENV the deployment stage of the api (default: none).
-# FAD_TOKEN access token (default: none).
-# FAD_URL base url to FAD api endpoint (default: none).
-# REPOSITORY_URL url to repositories.yml (default: none).
-# REPOSITORY_ID repository shortname (default: demo).
-#
+require_relative 'lib/arclight/indexer'
+require_relative 'lib/solr/client'
+require_relative 'lib/utils/file'
+require_relative 'lib/utils/oai'
 
 namespace :arclight do
-  namespace :fad do
-    def yesterday_ts
-      (Time.now.utc - (3600 * 24)).to_i
-    end
 
-    desc 'Print FAD config'
-    task :config do
-      puts JSON.pretty_generate FAD::Client.get_config
-    end
-
-    desc 'Delete a resource by eadid'
+  namespace :solr do
+    desc 'Delete a record by eadid'
     task :delete, [:eadid] do |t, args|
       eadid = args[:eadid]
       raise 'No eadid marked for deletion' unless eadid
-      fad = FAD::Client.new(config: FAD::Client.get_config)
-      elapsed_time = fad.destroy(eadid: eadid)
+      solr = Solr::Client.new(endpoint: ENV.fetch('SOLR_URL'))
+      elapsed_time = solr.delete(eadid: eadid)
       puts "Delete query for #{eadid} completed in #{elapsed_time.round(3)} secs."
     end
+  end
 
-    desc 'Index resources via a FAD API endpoint'
-    task :index_api, [:since] do |t, args|
-      since = args[:since] ||= yesterday_ts
-      fad = FAD::Client.new(config: FAD::Client.setup)
-      response = fad.records(since: since)
-
-      deletes, updates = response.parse['items'].partition do |i|
-        i['deleted'] == 'true'
-      end
-
-      elapsed_time = fad.delete(records: deletes)
-      puts "Deleted #{deletes.count} records in #{elapsed_time.round(3)} secs."
-
-      elapsed_time = fad.update(records: updates)
-      puts "Indexed #{updates.count} records in #{elapsed_time.round(3)} secs."
+  namespace :oai do
+    def yesterday
+      Date.today.prev_day.to_s
     end
 
-    desc 'Index a resource via a url'
-    task :index_url, [:url] do |t, args|
+    desc 'Index records using an OAI endpoint'
+    task :index, [:since] do |t, args|
+      since = args[:since] ||= yesterday
+
+      oai  = Fieldhand::Repository.new(ENV.fetch('OAI_ENDPOINT'))
+      solr = Solr::Client.new(
+        endpoint: ENV.fetch('SOLR_URL'),
+        indexer:  ArcLight::Indexer.default_indexer
+      )
+
+      record_count = 0
+      elapsed_time = 0
+
+      oai.records(metadata_prefix: 'oai_ead', from: since).each do |record|
+        eadid = record.identifier
+        if ! record.deleted?
+          Utils::OAI.update_eadid(record: record, eadid: eadid)
+          ead = Utils::OAI.ead(record: record)
+          puts "Indexing eadid: #{eadid}"
+          elapsed_time += solr.index(
+            file: Utils::File.write(content: ead)
+          )
+        else
+          puts "Deleting eadid: #{eadid}"
+          elapsed_time += solr.delete(eadid: eadid)
+        end
+        record_count += 1
+      end
+
+      puts "Indexed / deleted #{record_count} records in #{elapsed_time.round(3)} secs."
+    end
+  end
+
+  namespace :http do
+    desc 'Index a record via url'
+    task :index, [:url] do |t, args|
       url = args[:url]
       raise 'No url specified for indexing' unless url
-      fad = FAD::Client.new(config: FAD::Client.get_config)
-      elapsed_time = fad.index(
-        file: fad.write_to_file(content: fad.download(url: url).body)
+
+      solr = Solr::Client.new(
+        endpoint: ENV.fetch('SOLR_URL'),
+        indexer:  ArcLight::Indexer.default_indexer
       )
+
+      elapsed_time = solr.index(
+        file: Utils::File.write(content: HTTP.get(url).body)
+      )
+
       puts "Indexed #{url} in #{elapsed_time.round(3)} secs."
     end
   end
