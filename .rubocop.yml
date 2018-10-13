@@ -1,4 +1,9 @@
 ---
+Documentation:
+  Enabled: false
+Metrics/BlockLength:
+  Exclude:
+    - 'Rakefile'
 Metrics/LineLength:
   IgnoredPatterns:
     - !ruby ^#

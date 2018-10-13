@@ -1,28 +1,14 @@
 # frozen_string_literal: true
 
-require 'arclight'
-require 'benchmark'
-require 'dotenv/load'
-require 'fieldhand'
-require 'http'
-require 'nokogiri'
-require 'rsolr'
-require 'tmpdir'
-require 'uri'
-require 'yaml'
-
-require_relative 'lib/arclight/indexer'
-require_relative 'lib/solr/client'
-require_relative 'lib/utils/file'
-require_relative 'lib/utils/oai'
+require_relative 'requirements'
 
 namespace :arclight do
-
   namespace :solr do
     desc 'Delete a record by eadid'
-    task :delete, [:eadid] do |t, args|
+    task :delete, [:eadid] do |_t, args|
       eadid = args[:eadid]
       raise 'No eadid marked for deletion' unless eadid
+
       solr = Solr::Client.new(endpoint: ENV.fetch('SOLR_URL'))
       elapsed_time = solr.delete(eadid: eadid)
       puts "Delete query for #{eadid} completed in #{elapsed_time.round(3)} secs."
@@ -35,7 +21,7 @@ namespace :arclight do
     end
 
     desc 'Index records using an OAI endpoint'
-    task :index, [:since] do |t, args|
+    task :index, [:since] do |_t, args|
       since = args[:since] ||= yesterday
 
       oai  = Fieldhand::Repository.new(ENV.fetch('OAI_ENDPOINT'))
@@ -49,7 +35,7 @@ namespace :arclight do
 
       oai.records(metadata_prefix: 'oai_ead', from: since).each do |record|
         eadid = record.identifier
-        if ! record.deleted?
+        if !record.deleted?
           Utils::OAI.update_eadid(record: record, eadid: eadid)
           ead = Utils::OAI.ead(record: record)
           puts "Indexing eadid: #{eadid}"
@@ -69,7 +55,7 @@ namespace :arclight do
 
   namespace :http do
     desc 'Index a record via url'
-    task :index, [:url] do |t, args|
+    task :index, [:url] do |_t, args|
       url = args[:url]
       raise 'No url specified for indexing' unless url
 

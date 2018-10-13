@@ -1,7 +1,5 @@
 module Solr
-
   class Client
-
     attr_reader :endpoint, :indexer, :solr
 
     def initialize(endpoint: nil, indexer: nil)
@@ -35,7 +33,5 @@ module Solr
         indexer.update(file)
       end
     end
-
   end
-
 end
