@@ -3,9 +3,9 @@
 require 'arclight'
 require 'benchmark'
 require 'dotenv/load'
+require 'fieldhand'
 require 'http'
 require 'nokogiri'
-require 'oai'
 require 'rsolr'
 require 'tmpdir'
 require 'uri'
@@ -14,6 +14,7 @@ require 'yaml'
 require_relative 'lib/arclight/indexer'
 require_relative 'lib/solr/client'
 require_relative 'lib/utils/file'
+require_relative 'lib/utils/oai'
 
 namespace :arclight do
 
@@ -37,7 +38,7 @@ namespace :arclight do
     task :index, [:since] do |t, args|
       since = args[:since] ||= yesterday
 
-      oai  = OAI::Client.new(ENV.fetch('OAI_ENDPOINT'))
+      oai  = Fieldhand::Repository.new(ENV.fetch('OAI_ENDPOINT'))
       solr = Solr::Client.new(
         endpoint: ENV.fetch('SOLR_URL'),
         indexer:  ArcLight::Indexer.default_indexer
@@ -46,15 +47,23 @@ namespace :arclight do
       record_count = 0
       elapsed_time = 0
 
-      oai.list_records(:metadata_prefix => 'oai_ead', from: since).full.each do |record|
-        ead = REXML::XPath.first(record.metadata, '//ead')
-        elapsed_time += solr.index(
-          file: Utils::File.write(content: ead)
-        )
+      oai.records(metadata_prefix: 'oai_ead', from: since).each do |record|
+        eadid = record.identifier
+        if ! record.deleted?
+          Utils::OAI.update_eadid(record: record, eadid: eadid)
+          ead = Utils::OAI.ead(record: record)
+          puts "Indexing eadid: #{eadid}"
+          elapsed_time += solr.index(
+            file: Utils::File.write(content: ead)
+          )
+        else
+          puts "Deleting eadid: #{eadid}"
+          elapsed_time += solr.delete(eadid: eadid)
+        end
         record_count += 1
       end
 
-      puts "Indexed #{record_count} records in #{elapsed_time.round(3)} secs."
+      puts "Indexed / deleted #{record_count} records in #{elapsed_time.round(3)} secs."
     end
   end
 
