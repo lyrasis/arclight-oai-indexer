@@ -5,8 +5,8 @@ BlackLight web app.
 
 ```bash
 bundle install
-docker-compose -f docker-compose-solr.yml build
-docker-compose -f docker-compose-solr.yml up -d
+docker-compose build
+docker-compose up -d solr # run solr only
 
 # override .env (create: .env.local) to customize configuration
 source .env # sets $URL
@@ -17,18 +17,18 @@ bundle exec rake arclight:oai:index
 
 Solr: http://localhost:8983/
 
-## Docker
-
 Run an indexer container:
 
 ```bash
-docker-compose -f docker-compose-indexer.yml build
-docker-compose -f docker-compose-indexer.yml up
+docker-compose stop solr && docker-compose rm -f solr
+docker-compose up # -d for background
 ```
 
-Solr: http://localhost:8984/
+The indexer container will run until complete:
 
-See the `docker-compose-indexer.yml` for example configuration.
+`arclight-indexer_indexer_1 exited with code 0`
+
+See the `docker-compose.yml` for example configuration.
 
 ## ArcLight
 

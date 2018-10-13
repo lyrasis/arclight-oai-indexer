@@ -7,22 +7,23 @@ services:
       context: .
       dockerfile: Dockerfile.indexer
     depends_on:
-      - solr_indexer
+      - solr
     restart: on-failure
     environment:
-      SOLR_URL: http://solr_indexer:8983/solr/arclight
+      - "OAI_ENDPOINT=${OAI_ENDPOINT}"
+      - "SOLR_URL=http://solr:8983/solr/arclight"
     command:
       - bundle
       - exec
       - rake
       - arclight:oai:index
-  solr_indexer:
+  solr:
     image: arclight/solr
     build:
       context: .
       dockerfile: Dockerfile.solr
     ports:
-     - "8984:8983"
+     - "8983:8983"
     entrypoint:
       - docker-entrypoint.sh
       - solr-precreate
