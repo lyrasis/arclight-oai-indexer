@@ -3,6 +3,35 @@
 Ingest OAI EAD documents into Solr using the ArcLight Indexer decoupled from the
 BlackLight web app.
 
+## Quickstart
+
+To get up and running quickly there is a prebuilt image on Docker Hub:
+
+```bash
+docker run -it --rm \
+  -e OAI_ENDPOINT=https://archives.example.org/oai \
+  -e SOLR_URL=http://solr.example.org:8983/solr/arclight \
+  lyrasis/arclight-oai-indexer:latest
+```
+
+For this to work the container must be able to access the oai and solr urls, and
+the Solr instance should be using ArcLight's Solr configuration:
+
+[LINK](https://example.org)
+
+By default the indexer requests records updated since the previous day but you
+can specify the date explicitly:
+
+```bash
+docker run -it --rm \
+  # ... as before
+  lyrasis/arclight-oai-indexer:latest bundle exec rake arclight:oai:index[1970-01-01]
+```
+
+This is useful for populating an empty index or for full reindexing.
+
+## Setup
+
 ```bash
 bundle install
 docker-compose build
