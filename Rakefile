@@ -16,25 +16,50 @@ namespace :arclight do
   end
 
   namespace :oai do
-    def yesterday
-      Date.today.prev_day.to_s
-    end
-
-    desc 'Index records using an OAI endpoint'
-    task :index, [:since] do |_t, args|
-      since = args[:since] ||= yesterday
-
-      oai  = Fieldhand::Repository.new(ENV.fetch('OAI_ENDPOINT'))
-      solr = Solr::Client.new(
-        endpoint: ENV.fetch('SOLR_URL'),
-        indexer:  ArcLight::Indexer.default_indexer
-      )
+    def process(since: yesterday)
+      oai = Fieldhand::Repository.new(ENV.fetch('OAI_ENDPOINT'))
 
       record_count = 0
       elapsed_time = 0
 
       oai.records(metadata_prefix: 'oai_ead', from: since).each do |record|
+        record_count += 1
         eadid = record.identifier
+        yield eadid, record, elapsed_time
+      end
+
+      puts "Processed #{record_count} records in #{elapsed_time.round(3)} secs."
+    end
+
+    def yesterday
+      Date.today.prev_day.to_s
+    end
+
+    desc 'Download oai retrieved records'
+    task :download, [:since] do |_t, args|
+      since = args[:since] ||= yesterday
+      FileUtils.mkdir_p 'downloads'
+      process(since: since) do |eadid, record, elapsed_time|
+        elapsed_time += Benchmark.realtime do
+          filename = eadid.gsub(/\//, '_').squeeze('_')
+          ead      = Utils::OAI.ead(record: record)
+          File.open(File.join('downloads', "#{filename}.xml"), 'w') do |f|
+            f.write ead
+          end
+          puts "Downloaded: #{filename}"
+        end
+      end
+    end
+
+    desc 'Index records using an OAI endpoint'
+    task :index, [:since] do |_t, args|
+      since = args[:since] ||= yesterday
+      solr  = Solr::Client.new(
+        endpoint: ENV.fetch('SOLR_URL'),
+        indexer: ArcLight::Indexer.default_indexer
+      )
+
+      process(since: since) do |eadid, record, elapsed_time|
         if !record.deleted?
           Utils::OAI.update_eadid(record: record, eadid: eadid)
           ead = Utils::OAI.ead(record: record)
@@ -46,10 +71,7 @@ namespace :arclight do
           puts "Deleting eadid: #{eadid}"
           elapsed_time += solr.delete(eadid: eadid)
         end
-        record_count += 1
       end
-
-      puts "Indexed / deleted #{record_count} records in #{elapsed_time.round(3)} secs."
     end
   end
 
@@ -61,7 +83,7 @@ namespace :arclight do
 
       solr = Solr::Client.new(
         endpoint: ENV.fetch('SOLR_URL'),
-        indexer:  ArcLight::Indexer.default_indexer
+        indexer: ArcLight::Indexer.default_indexer
       )
 
       elapsed_time = solr.index(
