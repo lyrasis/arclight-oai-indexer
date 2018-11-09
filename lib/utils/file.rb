@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Utils
   module File
     def self.write(filename: 'ead.xml', content: nil)

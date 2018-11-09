@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module ArcLight
   class Indexer
     def self.default_indexer(options: {})
       options = {
-        document:  Arclight::CustomDocument,
+        document: Arclight::CustomDocument,
         component: Arclight::CustomComponent
       }.merge(options)
 

@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 module Utils
   module OAI
-    PATH_TO_EAD   = 'metadata[0]/ead[0]'.freeze
-    PATH_TO_EADID = "#{PATH_TO_EAD}/eadheader[0]/eadid[0]".freeze
+    PATH_TO_EAD   = 'metadata[0]/ead[0]'
+    PATH_TO_EADID = "#{PATH_TO_EAD}/eadheader[0]/eadid[0]"
 
     def self.ead(record: nil)
       record.element.locate(PATH_TO_EAD).map do |ead|
@@ -15,7 +17,7 @@ module Utils
 
     def self.update_eadid(record: nil, eadid: nil)
       element = record.element.locate(PATH_TO_EADID).first
-      element.replace_text(eadid) if element
+      element&.replace_text(eadid)
     end
   end
 end

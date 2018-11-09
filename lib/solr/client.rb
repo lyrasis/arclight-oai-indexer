@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Solr
   class Client
     attr_reader :endpoint, :indexer, :solr
