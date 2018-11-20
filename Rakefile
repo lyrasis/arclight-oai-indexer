@@ -22,10 +22,14 @@ namespace :arclight do
       record_count = 0
       elapsed_time = 0
 
-      oai.records(metadata_prefix: 'oai_ead', from: since).each do |record|
-        record_count += 1
-        eadid = record.identifier
-        yield eadid, record, elapsed_time
+      begin
+        oai.records(metadata_prefix: 'oai_ead', from: since).each do |record|
+          record_count += 1
+          eadid = record.identifier
+          yield eadid, record, elapsed_time
+        end
+      rescue Fieldhand::NoRecordsMatchError
+        puts "No record updates since: #{since} for #{oai.uri}"
       end
 
       puts "Processed #{record_count} records in #{elapsed_time.round(3)} secs."

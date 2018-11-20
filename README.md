@@ -15,9 +15,7 @@ docker run -it --rm \
 ```
 
 For this to work the container must be able to access the oai and solr urls, and
-the Solr instance should be using ArcLight's Solr configuration:
-
-[LINK](https://example.org)
+the Solr instance should be using [ArcLight's Solr configuration](https://github.com/sul-dlss/arclight/tree/master/solr/conf).
 
 By default the indexer requests records updated since the previous day but you
 can specify the date explicitly:
