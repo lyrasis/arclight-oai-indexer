@@ -15,15 +15,13 @@ module Solr
     end
 
     def delete(eadid: nil)
-      Benchmark.realtime do
-        solr.get(
-          'select',
-          params: {
-            q: solr.delete_by_query("ead_ssi:#{escape(eadid)}")
-          }
-        )
-        solr.commit
-      end
+      solr.get(
+        'select',
+        params: {
+          q: solr.delete_by_query("ead_ssi:#{escape(eadid)}")
+        }
+      )
+      solr.commit
     end
 
     def escape(string)
@@ -31,9 +29,7 @@ module Solr
     end
 
     def index(file: nil)
-      Benchmark.realtime do
-        indexer.update(file)
-      end
+      indexer.update(file)
     end
   end
 end

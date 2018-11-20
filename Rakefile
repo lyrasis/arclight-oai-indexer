@@ -26,7 +26,9 @@ namespace :arclight do
         oai.records(metadata_prefix: 'oai_ead', from: since).each do |record|
           record_count += 1
           eadid = record.identifier
-          yield eadid, record, elapsed_time
+          elapsed_time += Benchmark.realtime do
+            yield eadid, record
+          end
         end
       rescue Fieldhand::NoRecordsMatchError
         puts "No record updates since: #{since} for #{oai.uri}"
@@ -43,15 +45,13 @@ namespace :arclight do
     task :download, [:since] do |_t, args|
       since = args[:since] ||= yesterday
       FileUtils.mkdir_p 'downloads'
-      process(since: since) do |eadid, record, elapsed_time|
-        elapsed_time += Benchmark.realtime do
-          filename = eadid.gsub(/\//, '_').squeeze('_')
-          ead      = Utils::OAI.ead(record: record)
-          File.open(File.join('downloads', "#{filename}.xml"), 'w') do |f|
-            f.write ead
-          end
-          puts "Downloaded: #{filename}"
+      process(since: since) do |eadid, record|
+        filename = eadid.gsub(%r{/}, '_').squeeze('_')
+        ead      = Utils::OAI.ead(record: record)
+        File.open(File.join('downloads', "#{filename}.xml"), 'w') do |f|
+          f.write ead
         end
+        puts "Downloaded: #{filename}"
       end
     end
 
@@ -63,17 +63,17 @@ namespace :arclight do
         indexer: ArcLight::Indexer.default_indexer
       )
 
-      process(since: since) do |eadid, record, elapsed_time|
+      process(since: since) do |eadid, record|
         if !record.deleted?
           Utils::OAI.update_eadid(record: record, eadid: eadid)
           ead = Utils::OAI.ead(record: record)
           puts "Indexing eadid: #{eadid}"
-          elapsed_time += solr.index(
+          solr.index(
             file: Utils::File.write(content: ead)
           )
         else
           puts "Deleting eadid: #{eadid}"
-          elapsed_time += solr.delete(eadid: eadid)
+          solr.delete(eadid: eadid)
         end
       end
     end
