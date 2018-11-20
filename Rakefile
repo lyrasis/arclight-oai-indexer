@@ -10,8 +10,8 @@ namespace :arclight do
       raise 'No eadid marked for deletion' unless eadid
 
       solr = Solr::Client.new(endpoint: ENV.fetch('SOLR_URL'))
-      elapsed_time = solr.delete(eadid: eadid)
-      puts "Delete query for #{eadid} completed in #{elapsed_time.round(3)} secs."
+      solr.delete(eadid: eadid)
+      puts "Delete query for #{eadid} completed."
     end
   end
 
@@ -90,11 +90,11 @@ namespace :arclight do
         indexer: ArcLight::Indexer.default_indexer
       )
 
-      elapsed_time = solr.index(
+      solr.index(
         file: Utils::File.write(content: HTTP.get(url).body)
       )
 
-      puts "Indexed #{url} in #{elapsed_time.round(3)} secs."
+      puts "Indexed #{url}."
     end
   end
 end
