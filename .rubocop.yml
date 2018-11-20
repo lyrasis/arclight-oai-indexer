@@ -8,3 +8,6 @@ Metrics/LineLength:
   IgnoredPatterns:
     - !ruby ^#
     - !ruby ^\s*puts
+Metrics/MethodLength:
+  Exclude:
+    - 'Rakefile'
