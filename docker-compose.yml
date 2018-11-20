@@ -16,7 +16,7 @@ services:
       - bundle
       - exec
       - rake
-      - arclight:oai:index
+      - arclight:oai:index[1970-01-01]
   solr:
     image: arclight/solr
     build:

@@ -39,7 +39,8 @@ docker-compose up -d solr # run solr locally with docker (optional)
 source .env # sets $URL
 bundle exec rake arclight:http:index[$URL]
 bundle exec rake arclight:solr:delete[a0011.xml]
-bundle exec rake arclight:oai:index
+SINCE=1970-01-01
+bundle exec rake arclight:oai:index[$SINCE]
 ```
 
 Docker Solr: http://localhost:8983/
@@ -87,6 +88,15 @@ bundle exec rake arclight:generate
 cd .internal_test_app
 # update config/repositories.yml
 SOLR_URL=http://localhost:8983/solr/arclight ./bin/rails s
+```
+
+## Downloading EAD
+
+Export OAI EAD to `./downloads/`:
+
+```bash
+SINCE=1970-01-01
+bundle exec rake arclight:oai:download[$SINCE]
 ```
 
 ---
