@@ -1,6 +1,6 @@
 # ArcLight OAI Indexer
 
-[![Build Status](https://travis-ci.com/lyrasis/arclight-oai-indexer.svg?branch=master)](https://travis-ci.com/lyrasis/arclight-oai-indexer) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](http://opensource.org/licenses/MIT)
+[![Build Status](https://travis-ci.org/lyrasis/arclight-oai-indexer.svg?branch=master)](https://travis-ci.org/lyrasis/arclight-oai-indexer) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](http://opensource.org/licenses/MIT)
 
 Ingest OAI EAD documents into Solr using the ArcLight Indexer decoupled from the
 BlackLight web app.
