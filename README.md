@@ -1,5 +1,7 @@
 # ArcLight OAI Indexer
 
+[![Build Status](https://travis-ci.com/lyrasis/arclight-oai-indexer.svg?branch=master)](https://travis-ci.com/lyrasis/arclight-oai-indexer) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](http://opensource.org/licenses/MIT)
+
 Ingest OAI EAD documents into Solr using the ArcLight Indexer decoupled from the
 BlackLight web app.
 
@@ -98,5 +100,9 @@ Export OAI EAD to `./downloads/`:
 SINCE=1970-01-01
 bundle exec rake arclight:oai:download[$SINCE]
 ```
+
+## License
+
+The project is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
 
 ---
