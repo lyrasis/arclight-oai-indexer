@@ -92,6 +92,11 @@ cd .internal_test_app
 SOLR_URL=http://localhost:8983/solr/arclight ./bin/rails s
 ```
 
+## Deployment options
+
+- run container on a server using cron
+- run using CloudWatch Events and ECS Fargate
+
 ## Downloading EAD
 
 Export OAI EAD to `./downloads/`:
