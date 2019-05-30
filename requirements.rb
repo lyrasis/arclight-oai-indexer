@@ -32,7 +32,9 @@ module Fieldhand
           redos += 1
           if redos < 10 # rubocop:disable Style/GuardClause
             delay = redos * redos
-            logger.warn('Fieldhand') { "Response error #{e}\nRetrying in #{delay} seconds" }
+            logger.warn('Fieldhand') do
+              "Response error #{e}\nRetrying in #{delay} seconds"
+            end
             sleep delay
             redo
           else
@@ -45,7 +47,9 @@ module Fieldhand
 
         break unless response_parser.resumption_token
 
-        logger.debug('Fieldhand') { "Resumption token for #{verb}: #{response_parser.resumption_token}" }
+        logger.debug('Fieldhand') do
+          "Resumption token for #{verb}: #{response_parser.resumption_token}"
+        end
         query = { 'resumptionToken' => response_parser.resumption_token }
       end
     end
