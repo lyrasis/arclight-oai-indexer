@@ -40,7 +40,8 @@ docker-compose build
 ## Running the indexer locally
 
 ```bash
-docker-compose up -d solr # run solr locally with docker (optional)
+# run solr locally with docker (optional)
+docker-compose up -d solr
 
 # to override `.env` create `.env.local` for custom configuration
 source .env # sets $URL
