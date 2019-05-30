@@ -13,3 +13,4 @@ Metrics/LineLength:
 Metrics/MethodLength:
   Exclude:
     - 'Rakefile'
+  Max: 15
