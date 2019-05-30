@@ -10,7 +10,10 @@ namespace :arclight do
       eadid  = args[:eadid]
       raise 'No eadid marked for deletion' unless eadid
 
-      solr = Solr::Client.new(endpoint: ENV.fetch('SOLR_URL'))
+      solr = Solr::Client.new(
+        endpoint: ENV.fetch('SOLR_URL'),
+        logger: logger
+      )
       solr.delete(eadid: eadid)
       logger.info("Delete query for #{eadid} completed.")
     end
@@ -24,22 +27,14 @@ namespace :arclight do
         timeout: 300
       )
 
-      record_count = 0
-      elapsed_time = 0
-
       begin
         oai.records(metadata_prefix: 'oai_ead', from: since).each do |record|
-          record_count += 1
           eadid = record.identifier
-          elapsed_time += Benchmark.realtime do
-            yield eadid, record
-          end
+          yield eadid, record
         end
       rescue Fieldhand::NoRecordsMatchError
         logger.info("No record updates since: #{since} for #{oai.uri}")
       end
-
-      logger.info("Processed #{record_count} records in #{elapsed_time.round(3)} secs.")
     end
 
     def yesterday
@@ -67,7 +62,8 @@ namespace :arclight do
       since  = args[:since] ||= yesterday
       solr   = Solr::Client.new(
         endpoint: ENV.fetch('SOLR_URL'),
-        indexer: ArcLight::Indexer.default_indexer
+        indexer: ArcLight::Indexer.default_indexer,
+        logger: logger
       )
       index_files = []
 
@@ -95,7 +91,7 @@ namespace :arclight do
   end
 
   namespace :http do
-    desc 'Index a record via url'
+    desc 'Index a record from a url'
     task :index, [:url] do |_t, args|
       logger = Logger.new(STDOUT)
       url    = args[:url]
@@ -103,7 +99,8 @@ namespace :arclight do
 
       solr = Solr::Client.new(
         endpoint: ENV.fetch('SOLR_URL'),
-        indexer: ArcLight::Indexer.default_indexer
+        indexer: ArcLight::Indexer.default_indexer,
+        logger: logger
       )
 
       solr.index(
