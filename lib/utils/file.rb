@@ -2,9 +2,12 @@
 
 module Utils
   module File
-    def self.write(filename: 'ead.xml', content: nil)
+    # writes content to file and returns path
+    def self.cache(filename: 'ead.xml', content: nil)
       file = ::File.join(Dir.tmpdir, filename)
-      ::File.open(file, 'w') { |f| f.write(content) }
+      ::File.open(file, 'w') do |f|
+        f.write(content)
+      end
       file
     end
   end
