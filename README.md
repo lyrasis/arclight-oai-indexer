@@ -20,7 +20,7 @@ For this to work the container must be able to access the oai and solr urls, and
 the Solr instance should be using [ArcLight's Solr configuration](https://github.com/sul-dlss/arclight/tree/master/solr/conf).
 
 By default the indexer requests records updated since the previous day but you
-can specify the date explicitly:
+can specify the "from" date explicitly:
 
 ```bash
 docker run -it --rm \
@@ -35,6 +35,11 @@ This is useful for populating an empty index or for full reindexing.
 ```bash
 bundle install
 docker-compose build
+```
+
+## Running the indexer locally
+
+```bash
 docker-compose up -d solr # run solr locally with docker (optional)
 
 # to override `.env` create `.env.local` for custom configuration
@@ -46,6 +51,8 @@ bundle exec rake arclight:oai:index[$SINCE]
 ```
 
 Docker Solr: http://localhost:8983/
+
+## Running the indexer in a container
 
 Run an indexer container:
 
@@ -60,7 +67,7 @@ The indexer container will run until indexing is complete:
 
 See the `docker-compose.yml` for example configuration.
 
-## Remote Solr example
+## Using a remote Solr instance
 
 ```bash
 # these values can be set in `.env.local`
