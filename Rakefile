@@ -14,8 +14,9 @@ namespace :arclight do
         endpoint: ENV.fetch('SOLR_URL'),
         logger: logger
       )
+      logger.info("Deleting: #{eadid}")
       solr.delete(eadid: eadid)
-      logger.info("Delete query for #{eadid} completed.")
+      logger.info("Deleted: #{eadid}")
     end
   end
 
@@ -47,6 +48,7 @@ namespace :arclight do
       since  = args[:since] ||= yesterday
       FileUtils.mkdir_p 'downloads'
       process(since: since, logger: logger) do |eadid, record|
+        logger.info("Downloading: #{eadid}")
         filename = eadid.gsub(%r{/}, '_').squeeze('_')
         ead      = Utils::OAI.ead(record: record)
         File.open(File.join('downloads', "#{filename}.xml"), 'w') do |f|
@@ -69,6 +71,7 @@ namespace :arclight do
 
       process(since: since, logger: logger) do |eadid, record|
         if !record.deleted?
+          logger.info("Downloading: #{eadid}")
           Utils::OAI.update_eadid(record: record, eadid: eadid)
           filename = eadid.gsub(%r{/}, '_').squeeze('_')
           ead      = Utils::OAI.ead(record: record)
@@ -77,6 +80,7 @@ namespace :arclight do
         else
           logger.info("Deleting: #{eadid}")
           solr.delete(eadid: eadid)
+          logger.info("Deleted: #{eadid}")
         end
       end
 
@@ -85,6 +89,7 @@ namespace :arclight do
         solr.index(
           file: file
         )
+        logger.info("Indexed: #{file}")
         FileUtils.rm(file, force: true)
       end
     end
@@ -103,11 +108,11 @@ namespace :arclight do
         logger: logger
       )
 
+      logger.info("Indexing: #{url}")
       solr.index(
         file: Utils::File.cache(content: HTTP.get(url).body)
       )
-
-      logger.info("Indexed #{url}.")
+      logger.info("Indexed: #{url}")
     end
   end
 end
