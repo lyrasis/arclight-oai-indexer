@@ -6,6 +6,7 @@ Documentation:
 Metrics/BlockLength:
   Exclude:
     - 'Rakefile'
+    - '**/*.rake'
 Metrics/LineLength:
   IgnoredPatterns:
     - !ruby ^#
@@ -13,4 +14,5 @@ Metrics/LineLength:
 Metrics/MethodLength:
   Exclude:
     - 'Rakefile'
+    - '**/*.rake'
   Max: 15
