@@ -2,4 +2,4 @@
 .env.local
 *.txt
 downloads/
-tempfile.xml
+*.xml
