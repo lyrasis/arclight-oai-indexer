@@ -25,7 +25,7 @@ can specify the "from" date explicitly:
 ```bash
 docker run -it --rm \
   # ... as before
-  lyrasis/arclight-oai-indexer:latest bundle exec rake arclight:oai:index[1970-01-01]
+  lyrasis/arclight-oai-indexer:latest bundle exec rake arclight:index:oai[1970-01-01]
 ```
 
 This is useful for populating an empty index or for full reindexing.
@@ -45,10 +45,10 @@ docker-compose up -d solr
 
 # to override `.env` create `.env.local` for custom configuration
 source .env # sets $URL
-bundle exec rake arclight:http:index[$URL]
+bundle exec rake arclight:index:url[$URL]
 bundle exec rake arclight:solr:delete[a0011.xml]
 SINCE=1970-01-01
-bundle exec rake arclight:oai:index[$SINCE]
+bundle exec rake arclight:index:oai[$SINCE]
 ```
 
 Docker Solr: http://localhost:8983/
@@ -74,7 +74,7 @@ See the `docker-compose.yml` for example configuration.
 # these values can be set in `.env.local`
 OAI_ENDPOINT=https://archives.example.org/oai
 SOLR_URL=http://solr.example.org:8983/solr/arclight
-bundle exec rake arclight:oai:index
+bundle exec rake arclight:index:oai
 ```
 
 Or, with Docker:
@@ -111,7 +111,7 @@ Export OAI EAD to `./downloads/`:
 
 ```bash
 SINCE=1970-01-01
-bundle exec rake arclight:oai:download[$SINCE]
+bundle exec rake arclight:download:oai[$SINCE]
 ```
 
 ## License

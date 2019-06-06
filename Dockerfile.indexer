@@ -19,4 +19,4 @@ COPY Gemfile* /usr/app/
 RUN bundle install
 
 COPY . /usr/app/
-CMD ["bundle", "exec", "rake", "arclight:oai:index"]
+CMD ["bundle", "exec", "rake", "arclight:index:oai"]
