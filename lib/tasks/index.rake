@@ -57,18 +57,19 @@ namespace :arclight do
       )
       index_files = []
 
-      OAI::Harvester.harvest(since: since, logger: logger) do |eadid, record|
+      OAI::Harvester.harvest(since: since, logger: logger) do |record|
+        identifier = record.identifier
         if !record.deleted?
-          logger.info("Downloading: #{eadid}")
-          Utils::OAI.update_eadid(record: record, eadid: eadid)
-          filename = eadid.gsub(%r{/}, '_').squeeze('_')
+          logger.info("Downloading: #{identifier}")
+          Utils::OAI.update_eadid(record: record, eadid: identifier)
+          filename = identifier.gsub(%r{/}, '_').squeeze('_')
           ead      = Utils::OAI.ead(record: record)
           index_files << Utils::File.cache(filename: filename, content: ead)
           logger.info("Downloaded: #{index_files[-1]}")
         else
-          logger.info("Deleting: #{eadid}")
-          solr.delete(eadid: eadid)
-          logger.info("Deleted: #{eadid}")
+          logger.info("Deleting: #{identifier}")
+          solr.delete(eadid: identifier)
+          logger.info("Deleted: #{identifier}")
         end
       end
 

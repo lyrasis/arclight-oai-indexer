@@ -14,8 +14,7 @@ module OAI
 
       begin
         oai.records(metadata_prefix: 'oai_ead', from: since).each do |record|
-          eadid = record.identifier
-          yield eadid, record
+          yield record
         end
       rescue Fieldhand::NoRecordsMatchError
         logger.info("No record updates since: #{since} for #{oai.uri}")
