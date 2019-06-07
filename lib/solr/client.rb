@@ -1,9 +1,32 @@
 # frozen_string_literal: true
 
+require 'logger'
+
 module Solr
   class Client
-    attr_reader :endpoint, :indexer, :logger, :solr
+    def self.client
+      @client ||= Solr::Client.new(
+        endpoint: ENV.fetch('SOLR_URL'),
+        indexer: ArcLight::Indexer.default_indexer,
+        logger: Logger.new(STDOUT)
+      )
+    end
 
+    def self.delete(eadid:, logger: Logger.new(STDOUT))
+      logger.info("Deleting: #{eadid}")
+      client.delete(eadid: eadid)
+      logger.info("Deleted: #{eadid}")
+    end
+
+    def self.index(file:, logger: Logger.new(STDOUT))
+      logger.info("Indexing: #{file}")
+      client.index(
+        file: file
+      )
+      logger.info("Indexed: #{file}")
+    end
+
+    attr_reader :endpoint, :indexer, :logger, :solr
     def initialize(endpoint: nil, indexer: nil, logger: nil)
       @endpoint = endpoint
       @indexer  = indexer

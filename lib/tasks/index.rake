@@ -5,22 +5,11 @@ namespace :arclight do
     # bundle exec rake arclight:index:dir[/path/to/dir]
     desc 'Index EAD files from a directory'
     task :dir, [:dir] do |_t, args|
-      logger = Logger.new(STDOUT)
-      dir    = args[:dir]
+      dir = args[:dir]
       raise "Directory not found: #{dir}" unless File.directory?(dir)
 
-      solr = Solr::Client.new(
-        endpoint: ENV.fetch('SOLR_URL'),
-        indexer: ArcLight::Indexer.default_indexer,
-        logger: logger
-      )
-
       Dir["#{dir}/*.xml"].each do |file|
-        logger.info("Indexing: #{file}")
-        solr.index(
-          file: file
-        )
-        logger.info("Indexed: #{file}")
+        Solr::Client.index(file: file)
         FileUtils.mv file, "#{file}.bak"
       end
     end
@@ -28,21 +17,10 @@ namespace :arclight do
     # bundle exec rake arclight:index:file[/path/to/file]
     desc 'Index an EAD file'
     task :file, [:file] do |_t, args|
-      logger = Logger.new(STDOUT)
-      file   = args[:file]
+      file = args[:file]
       raise "File not found: #{file}" unless File.file?(file)
 
-      solr = Solr::Client.new(
-        endpoint: ENV.fetch('SOLR_URL'),
-        indexer: ArcLight::Indexer.default_indexer,
-        logger: logger
-      )
-
-      logger.info("Indexing: #{file}")
-      solr.index(
-        file: file
-      )
-      logger.info("Indexed: #{file}")
+      Solr::Client.index(file: file)
     end
 
     # bundle exec rake arclight:index:oai
@@ -50,11 +28,6 @@ namespace :arclight do
     task :oai, [:since] do |_t, args|
       logger = Logger.new(STDOUT)
       since  = args[:since] ||= yesterday
-      solr   = Solr::Client.new(
-        endpoint: ENV.fetch('SOLR_URL'),
-        indexer: ArcLight::Indexer.default_indexer,
-        logger: logger
-      )
       index_files = []
 
       OAI::Harvester.harvest(since: since, logger: logger) do |record|
@@ -67,39 +40,22 @@ namespace :arclight do
           index_files << Utils::File.cache(filename: filename, content: ead)
           logger.info("Downloaded: #{index_files[-1]}")
         else
-          logger.info("Deleting: #{identifier}")
-          solr.delete(eadid: identifier)
-          logger.info("Deleted: #{identifier}")
+          Solr::Client.delete(eadid: identifier)
         end
       end
 
       index_files.each do |file|
-        logger.info("Indexing: #{file}")
-        solr.index(
-          file: file
-        )
-        logger.info("Indexed: #{file}")
+        Solr::Client.index(file: file)
         FileUtils.rm(file, force: true)
       end
     end
 
     desc 'Index an EAD record from a url'
     task :url, [:url] do |_t, args|
-      logger = Logger.new(STDOUT)
-      url    = args[:url]
+      url = args[:url]
       raise 'No url specified for indexing' unless url
 
-      solr = Solr::Client.new(
-        endpoint: ENV.fetch('SOLR_URL'),
-        indexer: ArcLight::Indexer.default_indexer,
-        logger: logger
-      )
-
-      logger.info("Indexing: #{url}")
-      solr.index(
-        file: Utils::File.cache(content: HTTP.get(url).body)
-      )
-      logger.info("Indexed: #{url}")
+      Solr::Client.index(file: Utils::File.cache(content: HTTP.get(url).body))
     end
   end
 end
