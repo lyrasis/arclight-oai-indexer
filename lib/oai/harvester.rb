@@ -5,7 +5,7 @@ require 'fieldhand'
 
 module OAI
   module Harvester
-    def self.harvest(since: yesterday, logger: nil)
+    def self.harvest(since: yesterday, logger: Logger.new(STDOUT))
       oai = Fieldhand::Repository.new(
         ENV.fetch('OAI_ENDPOINT'),
         logger: logger,
