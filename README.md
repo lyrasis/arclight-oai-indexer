@@ -114,6 +114,12 @@ SINCE=1970-01-01
 bundle exec rake arclight:download:oai[$SINCE]
 ```
 
+You can then index using the directory:
+
+```bash
+bundle exec rake arclight:index:dir[downloads]
+```
+
 ## License
 
 The project is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
