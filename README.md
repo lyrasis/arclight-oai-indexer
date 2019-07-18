@@ -110,6 +110,7 @@ SOLR_URL=http://localhost:8983/solr/arclight ./bin/rails s
 Export OAI EAD to `./downloads/`:
 
 ```bash
+OAI_ENDPOINT=http://test.archivesspace.org/oai
 SINCE=1970-01-01
 bundle exec rake arclight:download:oai[$SINCE]
 ```
