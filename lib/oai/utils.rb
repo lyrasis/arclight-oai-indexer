@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module Utils
-  module OAI
+module OAI
+  module Utils
     PATH_TO_EAD   = 'metadata[0]/ead[0]'
     PATH_TO_EADID = "#{PATH_TO_EAD}/eadheader[0]/eadid[0]"
     PATH_TO_REPO  = "#{PATH_TO_EAD}/archdesc[0]/did[0]/repository[0]/corpname[0]" # rubocop:disable Metrics/LineLength

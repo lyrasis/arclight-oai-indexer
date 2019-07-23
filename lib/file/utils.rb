@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module Utils
-  module File
+class File
+  module Utils
     # writes content to file and returns path
     def self.cache(filename: 'ead.xml', content: nil)
       file = ::File.join(Dir.tmpdir, filename)

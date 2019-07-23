@@ -29,15 +29,19 @@ namespace :arclight do
       logger = Logger.new(STDOUT)
       since  = args[:since] ||= yesterday
       index_files = []
+      manager = Repository::Manager.new(
+        excludes: ENV.fetch('REPO_EXCLUDES', nil),
+        includes: ENV.fetch('REPO_INCLUDES', nil)
+      )
 
-      OAI::Harvester.harvest(since: since, logger: logger) do |record|
+      harvester = OAI::Harvester.new(manager: manager)
+      harvester.harvest(since: since, logger: logger) do |record|
         identifier = record.identifier
         if !record.deleted?
           logger.info("Downloading: #{identifier}")
-          Utils::OAI.update_eadid(record: record, eadid: identifier)
           filename = identifier.gsub(%r{/}, '_').squeeze('_')
-          ead      = Utils::OAI.ead(record: record)
-          index_files << Utils::File.cache(filename: filename, content: ead)
+          ead      = OAI::Utils.ead(record: record)
+          index_files << File::Utils.cache(filename: filename, content: ead)
           logger.info("Downloaded: #{index_files[-1]}")
         else
           Solr::Client.delete(eadid: identifier)
@@ -55,7 +59,7 @@ namespace :arclight do
       url = args[:url]
       raise 'No url specified for indexing' unless url
 
-      Solr::Client.index(file: Utils::File.cache(content: HTTP.get(url).body))
+      Solr::Client.index(file: File::Utils.cache(content: HTTP.get(url).body))
     end
   end
 end

@@ -71,7 +71,7 @@ See the `docker-compose.yml` for example configuration.
 ## Using a remote Solr instance
 
 ```bash
-# these values can be set in `.env.local`
+# these values should be set in `.env.local`
 OAI_ENDPOINT=https://archives.example.org/oai
 SOLR_URL=http://solr.example.org:8983/solr/arclight
 bundle exec rake arclight:index:oai
@@ -110,7 +110,6 @@ SOLR_URL=http://localhost:8983/solr/arclight ./bin/rails s
 Export OAI EAD to `./downloads/`:
 
 ```bash
-OAI_ENDPOINT=http://test.archivesspace.org/oai
 SINCE=1970-01-01
 bundle exec rake arclight:download:oai[$SINCE]
 ```
@@ -119,6 +118,38 @@ You can then index using the directory:
 
 ```bash
 bundle exec rake arclight:index:dir[downloads]
+```
+
+## Filtering records by repository
+
+In some cases it may be necessary to filter out records belonging
+to certain repositories at download / harvest time.
+
+There are two environment variables that can be used to filter by
+repository:
+
+- `REPO_EXCLUDES`: skip record if repository is in this list
+- `REPO_INCLUDES`: retain record if the repository is in this list
+
+The variable should contain a comma delimited string of repositories:
+
+```text
+# skip record if repository value matches one of these
+REPO_EXCLUDES="Repo 1, Repo 2, Test"
+
+# include record only if repository matches one of these
+REPO_INCLUDES="Repo 4, Repo 8, Demo"
+```
+
+- Repository = '/ead/archdesc/did/repository/corpname'.
+- Neither, one or both variables can be used.
+- If neither is defined then records are not filtered.
+- Excludes are processed first.
+
+```bash
+SINCE=1970-01-01
+REPO_INCLUDES='LYRASIS Corporate Archive,TEST RP'
+bundle exec rake arclight:download:oai[$SINCE]
 ```
 
 ## License
