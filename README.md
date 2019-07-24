@@ -148,8 +148,7 @@ REPO_INCLUDES="Repo 4, Repo 8, Demo"
 
 ```bash
 SINCE=1970-01-01
-REPO_INCLUDES='LYRASIS Corporate Archive,TEST RP'
-bundle exec rake arclight:download:oai[$SINCE]
+REPO_INCLUDES='LYRASIS Corporate Archive,TEST RP' bundle exec rake arclight:download:oai[$SINCE]
 ```
 
 ## License

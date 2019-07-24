@@ -5,7 +5,6 @@ namespace :arclight do
     desc 'Download oai retrieved records'
     task :oai, [:since] do |_t, args|
       logger = Logger.new(STDOUT)
-      since  = args[:since] ||= yesterday
       FileUtils.mkdir_p 'downloads'
       manager = Repository::Manager.new(
         excludes: ENV.fetch('REPO_EXCLUDES', nil),
@@ -13,7 +12,10 @@ namespace :arclight do
       )
 
       harvester = OAI::Harvester.new(manager: manager)
-      harvester.harvest(since: since, logger: logger) do |record|
+      harvester.logger = logger
+      harvester.since  = args[:since] unless args[:since].nil?
+
+      harvester.harvest do |record|
         identifier = record.identifier
         logger.info("Downloading: #{identifier}")
         filename = identifier.gsub(%r{/}, '_').squeeze('_')

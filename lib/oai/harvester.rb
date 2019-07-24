@@ -5,14 +5,17 @@ require 'fieldhand'
 
 module OAI
   class Harvester
+    attr_accessor :logger, :since
     attr_reader :manager
 
     def initialize(manager: Repository::Manager.new)
+      @logger  = Logger.new(STDOUT)
       @manager = manager
+      @since   = yesterday
     end
 
     # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
-    def harvest(since: yesterday, logger: Logger.new(STDOUT))
+    def harvest
       oai = Fieldhand::Repository.new(
         ENV.fetch('OAI_ENDPOINT'), logger: logger, timeout: 300
       )
@@ -32,6 +35,7 @@ module OAI
         logger.info("No record updates since: #{since} for #{oai.uri}")
       end
     end
+    # rubocop:enable Metrics/AbcSize,Metrics/MethodLength
 
     def yesterday
       Date.today.prev_day.to_s
