@@ -42,7 +42,7 @@ namespace :arclight do
         if !record.deleted?
           logger.info("Downloading: #{identifier}")
           filename = identifier.gsub(%r{/}, '_').squeeze('_')
-          ead      = OAI::Utils.ead(record: record)
+          ead      = OAI::Utils.oai_ead(record: record)
           index_files << File::Utils.cache(filename: filename, content: ead)
           logger.info("Downloaded: #{index_files[-1]}")
         else

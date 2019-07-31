@@ -3,7 +3,7 @@
 namespace :arclight do
   namespace :download do
     desc 'Download oai retrieved records'
-    task :oai, [:since] do |_t, args|
+    task :oai, [:since, :prefix] do |_t, args|
       logger = Logger.new(STDOUT)
       FileUtils.mkdir_p 'downloads'
       manager = Repository::Manager.new(
@@ -14,14 +14,17 @@ namespace :arclight do
       harvester = OAI::Harvester.new(manager: manager)
       harvester.logger = logger
       harvester.since  = args[:since] unless args[:since].nil?
+      harvester.prefix = args[:prefix] ||= 'oai_ead'
 
       harvester.harvest do |record|
         identifier = record.identifier
         logger.info("Downloading: #{identifier}")
         filename = identifier.gsub(%r{/}, '_').squeeze('_')
-        ead      = OAI::Utils.ead(record: record)
+
+        content = OAI::Utils.send(harvester.prefix, record: record)
+
         File.open(File.join('downloads', "#{filename}.xml"), 'w') do |f|
-          f.write ead
+          f.write content
         end
         logger.info("Downloaded: #{filename}")
       end
