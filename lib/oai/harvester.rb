@@ -22,7 +22,9 @@ module OAI
     # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
     def harvest
       oai = Fieldhand::Repository.new(
-        ENV.fetch('OAI_ENDPOINT'), logger: logger, timeout: 300
+        ENV.fetch('OAI_ENDPOINT'),
+        logger: logger,
+        timeout: ENV.fetch('OAI_TIMEOUT', '300').to_i
       )
 
       begin
