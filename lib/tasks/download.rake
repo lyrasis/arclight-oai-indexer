@@ -18,7 +18,6 @@ namespace :arclight do
 
       harvester.harvest do |record|
         identifier = record.identifier
-        logger.info("Downloading: #{identifier}")
         filename = identifier.gsub(%r{/}, '_').squeeze('_')
 
         content = OAI::Utils.send(harvester.prefix, record: record)
@@ -26,7 +25,7 @@ namespace :arclight do
         File.open(File.join('downloads', "#{filename}.xml"), 'w') do |f|
           f.write content
         end
-        logger.info("Downloaded: #{filename}")
+        logger.info("Harvested: #{filename}")
       end
     end
   end

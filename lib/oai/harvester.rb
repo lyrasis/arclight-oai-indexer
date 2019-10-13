@@ -28,23 +28,30 @@ module OAI
       )
 
       begin
-        oai.records(metadata_prefix: prefix, from: since).each do |record|
-          if prefix != default_prefix
-            yield record
-            next
-          end
+        oai.identifiers(metadata_prefix: prefix, from: since).each do |header|
+          identifier = header.identifier
+          begin
+            logger.info("Harvesting: #{identifier}")
+            record = oai.get(identifier, metadata_prefix: prefix)
+            if prefix != default_prefix
+              yield record
+              next
+            end
 
-          identifier = record.identifier
-          repository = OAI::Utils.repository(record: record)
-          if manager.exclude?(repository) || !manager.include?(repository)
-            logger.info("Skipping repository: #{repository}, #{identifier}")
+            repository = OAI::Utils.repository(record: record)
+            if manager.exclude?(repository) || !manager.include?(repository)
+              logger.info("Skipping repository: #{repository}, #{identifier}")
+              next
+            end
+            OAI::Utils.update_eadid(record: record, eadid: identifier)
+            yield record
+          rescue StandardError => ex
+            logger.error("Error harvesting [#{identifier}]: #{ex.message}")
             next
           end
-          OAI::Utils.update_eadid(record: record, eadid: identifier)
-          yield record
         end
       rescue Fieldhand::NoRecordsMatchError
-        logger.info("No record updates since: #{since} for #{oai.uri}")
+        logger.info("No repository updates since: #{since} for #{oai.uri}")
       end
     end
     # rubocop:enable Metrics/AbcSize,Metrics/MethodLength
