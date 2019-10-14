@@ -12,12 +12,15 @@ To get up and running quickly there is a prebuilt image on Docker Hub:
 ```bash
 docker run -it --rm \
   -e OAI_ENDPOINT=https://archives.example.org/oai \
+  -e REPOSITORY_URL=https://archives.example.org/repositories.yml \
   -e SOLR_URL=http://solr.example.org:8983/solr/arclight \
   lyrasis/arclight-oai-indexer:latest
 ```
 
 For this to work the container must be able to access the oai and solr urls, and
 the Solr instance should be using [ArcLight's Solr configuration](https://github.com/sul-dlss/arclight/tree/master/solr/conf).
+
+The `REPOSITORY_URL` must point to a [publicly downloadable configuration](https://s3-us-west-2.amazonaws.com/as-public-shared-files/dts/dts.repo.yml) file.
 
 By default the indexer requests records updated since the previous day but you
 can specify the "from" date explicitly:
@@ -44,9 +47,6 @@ docker-compose build
 docker-compose up -d solr
 
 # to override `.env` create `.env.local` for custom configuration
-source .env # sets $URL
-bundle exec rake arclight:index:url[$URL]
-bundle exec rake arclight:solr:delete[a0011.xml]
 SINCE=1970-01-01
 bundle exec rake arclight:index:oai[$SINCE]
 ```
@@ -118,37 +118,6 @@ You can then index using the directory:
 
 ```bash
 bundle exec rake arclight:index:dir[downloads]
-```
-
-## Filtering records by repository
-
-In some cases it may be necessary to filter out records belonging
-to certain repositories at download / harvest time.
-
-There are two environment variables that can be used to filter by
-repository:
-
-- `REPO_EXCLUDES`: skip record if repository is in this list
-- `REPO_INCLUDES`: retain record if the repository is in this list
-
-The variable should contain a comma delimited string of repositories:
-
-```text
-# skip record if repository value matches one of these
-REPO_EXCLUDES="Repo 1, Repo 2, Test"
-
-# include record only if repository matches one of these
-REPO_INCLUDES="Repo 4, Repo 8, Demo"
-```
-
-- Repository = '/ead/archdesc/did/repository/corpname'.
-- Neither, one or both variables can be used.
-- If neither is defined then records are not filtered.
-- Excludes are processed first.
-
-```bash
-SINCE=1970-01-01
-REPO_INCLUDES='LYRASIS Corporate Archive,TEST RP' bundle exec rake arclight:download:oai[$SINCE]
 ```
 
 ## License

@@ -2,21 +2,29 @@
 
 module Repository
   class Manager
-    def initialize(excludes: nil, includes: nil)
-      @excludes = excludes ? excludes.split(',') : nil
-      @includes = includes ? includes.split(',') : nil
+    attr_reader :file, :repositories
+    def initialize(repositories:)
+      @repositories = download(repositories)
+      @file = File::Utils.cache(
+        filename: 'repositories.yml',
+        content: @repositories.to_yaml
+      )
+      ENV['REPOSITORY_FILE'] = @file
     end
 
-    def exclude?(repository)
-      return false unless @excludes
-
-      @excludes.include?(repository)
+    def valid_identifier?(identifier)
+      repositories.find do |_, repo|
+        identifier.start_with?(repo['identifier_prefix'])
+      end
     end
 
-    def include?(repository)
-      return true unless @includes
+    def download(repositories)
+      YAML.safe_load(HTTP.get(repositories).to_s)
+    end
 
-      @includes.include?(repository)
+    def find_repository_id_for(repository)
+      id = repositories.find { |_, repo| repo['name'] == repository }
+      id.nil? ? nil : id.first
     end
   end
 end

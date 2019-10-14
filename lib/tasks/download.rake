@@ -7,8 +7,7 @@ namespace :arclight do
       logger = Logger.new(STDOUT)
       FileUtils.mkdir_p 'downloads'
       manager = Repository::Manager.new(
-        excludes: ENV.fetch('REPO_EXCLUDES', nil),
-        includes: ENV.fetch('REPO_INCLUDES', nil)
+        repositories: ENV.fetch('REPOSITORY_URL')
       )
 
       harvester = OAI::Harvester.new(manager: manager)
@@ -16,7 +15,7 @@ namespace :arclight do
       harvester.since  = args[:since] unless args[:since].nil?
       harvester.prefix = args[:prefix] ||= 'oai_ead'
 
-      harvester.harvest do |record|
+      harvester.harvest do |record, _|
         identifier = record.identifier
         filename = identifier.gsub(%r{/}, '_').squeeze('_')
 

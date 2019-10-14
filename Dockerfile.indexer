@@ -6,6 +6,7 @@ ENV TERM=linux
 ENV PS1 "\n\n>> ruby \W \$ "
 
 ENV OAI_ENDPOINT=https://archivesspace.lyrasistechnology.org/oai \
+    REPOSITORY_URL=https://s3-us-west-2.amazonaws.com/as-public-shared-files/dts/dts.repo.yml \
     SOLR_URL=http://127.0.0.1:8983/solr/arclight
 
 RUN apk --no-cache add $BUILD_PACKAGES $RUBY_PACKAGES && \

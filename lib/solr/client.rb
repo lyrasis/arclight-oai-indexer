@@ -19,11 +19,11 @@ module Solr
     end
 
     def self.index(file:, logger: Logger.new(STDOUT))
-      logger.info("Indexing: #{file}")
+      logger.info("Indexing [#{ENV['REPOSITORY_ID']}]: #{file}")
       client.index(
         file: file
       )
-      logger.info("Indexed: #{file}")
+      logger.info("Indexed [#{ENV['REPOSITORY_ID']}]: #{file}")
     end
 
     attr_reader :endpoint, :indexer, :logger, :solr

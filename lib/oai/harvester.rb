@@ -30,21 +30,23 @@ module OAI
       begin
         oai.identifiers(metadata_prefix: prefix, from: since).each do |header|
           identifier = header.identifier
+          unless manager.valid_identifier?(identifier)
+            logger.info("Identifier not matched: #{identifier}")
+            next
+          end
           begin
             logger.info("Harvesting: #{identifier}")
             record = oai.get(identifier, metadata_prefix: prefix)
-            if prefix != default_prefix
-              yield record
+
+            repository = OAI::Utils.repository(record: record)
+            repository_id = manager.find_repository_id_for(repository)
+            unless repository_id
+              logger.info("Repository not found: #{repository}")
               next
             end
 
-            repository = OAI::Utils.repository(record: record)
-            if manager.exclude?(repository) || !manager.include?(repository)
-              logger.info("Skipping repository: #{repository}, #{identifier}")
-              next
-            end
             OAI::Utils.update_eadid(record: record, eadid: identifier)
-            yield record
+            yield record, repository_id
           rescue StandardError => ex
             logger.error("Error harvesting [#{identifier}]: #{ex.message}")
             next
