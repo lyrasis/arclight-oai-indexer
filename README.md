@@ -5,7 +5,9 @@
 Ingest OAI EAD documents into Solr using the ArcLight Indexer decoupled from the
 BlackLight web app.
 
-## Quickstart
+**Note:** from 10/14/19 `REPOSITORY_URL` is required.
+
+## Getting started
 
 To get up and running quickly there is a prebuilt image on Docker Hub:
 
@@ -20,7 +22,39 @@ docker run -it --rm \
 For this to work the container must be able to access the oai and solr urls, and
 the Solr instance should be using [ArcLight's Solr configuration](https://github.com/sul-dlss/arclight/tree/master/solr/conf).
 
-The `REPOSITORY_URL` must point to a [publicly downloadable configuration](https://s3-us-west-2.amazonaws.com/as-public-shared-files/dts/dts.repo.yml) file.
+The `REPOSITORY_URL` must point to a [publicly downloadable configuration](https://github.com/projectblacklight/arclight/blob/master/spec/fixtures/config/repositories.yml) file:
+
+```yml
+# https://s3-us-west-2.amazonaws.com/as-public-shared-files/dts/dts.repo.yml
+lyrasis_special_collections:
+  identifier_prefix: "oai:demo//repositories/2/"
+  name: "LYRASIS Special Collections"
+  description: "LYRASIS Special Collections"
+  building: "LYRASIS"
+  address1: "1438 West Peachtree Street, NW, Ste 150"
+  address2: ""
+  city: "Atlanta"
+  state: "GA"
+  zip: "30309"
+  country: "USA"
+  phone: ""
+  contact_info: ""
+  thumbnail_url: "https://s3-us-west-2.amazonaws.com/as-public-shared-files/dts/dts.logo.png"
+```
+
+The `identifier_prefix` is used for record filtering, and in some cases provides
+harvesting optimization. For harvesting the `ListIdentifiers` feed is processed
+and if a record identifier does not begin with a prefix defined for _any_ repository
+in the configuration file a subsequent `GetRecord` request is not issued.
+
+During harvesting the indexer will attempt to match the
+[repository name in the EAD](https://github.com/lyrasis/arclight-oai-indexer/blob/master/lib/oai/utils.rb#L8)
+to a repository `name` in the configuration file to set the `REPOSITORY_ID` for
+the ArcLight indexer. If no match is found the harvested record will be discarded
+and not indexed into Solr.
+
+These restrictions make it possible to harvest an OAI EAD provider on a per
+repository basis.
 
 By default the indexer requests records updated since the previous day but you
 can specify the "from" date explicitly:
