@@ -2,10 +2,12 @@
 
 [![Build Status](https://travis-ci.org/lyrasis/arclight-oai-indexer.svg?branch=master)](https://travis-ci.org/lyrasis/arclight-oai-indexer) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](http://opensource.org/licenses/MIT)
 
-Ingest OAI EAD documents into Solr using the ArcLight Indexer decoupled from the
-BlackLight web app.
+Ingest OAI EAD documents into Solr using the ArcLight Indexer.
 
-**Note:** from 10/14/19 `REPOSITORY_URL` is required.
+**Notes:**
+
+- `v0.1.0` `REPOSITORY_URL` is required.
+- `v0.2.0+` requires ArcLight `v0.3.0` and uses Traject for indexing.
 
 ## Getting started
 

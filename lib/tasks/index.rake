@@ -9,9 +9,8 @@ namespace :arclight do
       raise "Directory not found: #{dir}" unless File.directory?(dir)
 
       Dir["#{dir}/*.xml"].each do |file|
-        # TODO: get & set repository_id, needs manager
-        Solr::Client.index(file: file)
-        FileUtils.mv file, "#{file}.bak"
+        Rake::Task['arclight:index:file'].invoke(file)
+        Rake::Task['arclight:index:file'].reenable
       end
     end
 
@@ -19,10 +18,18 @@ namespace :arclight do
     desc 'Index an EAD file'
     task :file, [:file] do |_t, args|
       file = args[:file]
-      # TODO: repository_id arg
       raise "File not found: #{file}" unless File.file?(file)
 
+      manager = Repository::Manager.new(
+        repositories: ENV.fetch('REPOSITORY_URL')
+      )
+
+      doc = Nokogiri::XML(File.open(file))
+      repository = XML::Utils.repository(doc: doc)
+      repository_id = manager.find_repository_id_for(repository)
+      ENV['REPOSITORY_ID'] = repository_id
       Solr::Client.index(file: file)
+      FileUtils.mv file, "#{file}.bak"
     end
 
     # bundle exec rake arclight:index:oai
@@ -63,10 +70,11 @@ namespace :arclight do
     desc 'Index an EAD record from a url'
     task :url, [:url] do |_t, args|
       url = args[:url]
-      # TODO: repository_id arg
       raise 'No url specified for indexing' unless url
 
-      Solr::Client.index(file: File::Utils.cache(content: HTTP.get(url).body))
+      Rake::Task['arclight:index:file'].invoke(
+        File::Utils.cache(content: HTTP.get(url))
+      )
     end
   end
 end

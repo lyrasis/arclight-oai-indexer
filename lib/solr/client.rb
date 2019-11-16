@@ -7,7 +7,10 @@ module Solr
     def self.client
       @client ||= Solr::Client.new(
         endpoint: ENV.fetch('SOLR_URL'),
-        indexer: ArcLight::Indexer.default_indexer,
+        indexer: File::Utils.cache(
+          filename: 'indexer.rb',
+          content: HTTP.get(ENV.fetch('INDEXER_CONFIG_URL')).body
+        ),
         logger: Logger.new(STDOUT)
       )
     end
@@ -39,15 +42,13 @@ module Solr
     end
 
     def delete(eadid: nil)
-      with_retry do
-        solr.get(
-          'select',
-          params: {
-            q: solr.delete_by_query("ead_ssi:#{escape(eadid)}")
-          }
-        )
-        solr.commit
-      end
+      solr.get(
+        'select',
+        params: {
+          q: solr.delete_by_query("ead_ssi:#{escape(eadid)}")
+        }
+      )
+      solr.commit
     end
 
     def escape(string)
@@ -55,24 +56,7 @@ module Solr
     end
 
     def index(file: nil)
-      with_retry do
-        indexer.update(file)
-      end
-    end
-
-    def with_retry
-      attempts = 0
-      loop do
-        begin
-          yield
-          break
-        rescue RSolr::Error::ConnectionRefused => ex
-          raise ex if attempts == 5
-
-          logger.warn("Retrying connection to Solr: #{ex.message}")
-          sleep((attempts += 1) * 30)
-        end
-      end
+      `bundle exec traject -u #{endpoint} -i xml -c #{indexer} #{file}`
     end
   end
 end
