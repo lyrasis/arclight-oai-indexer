@@ -12,6 +12,7 @@ services:
     environment:
       - "INDEXER_CONFIG_URL=https://raw.githubusercontent.com/projectblacklight/arclight/v0.3.0/lib/arclight/traject/ead2_config.rb"
       - "OAI_ENDPOINT=${OAI_ENDPOINT}"
+      - "REPOSITORY_URL=https://s3-us-west-2.amazonaws.com/as-public-shared-files/dts/dts.repo.yml"
       - "SOLR_URL=http://solr:8983/solr/arclight"
     command:
       - bundle

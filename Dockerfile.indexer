@@ -1,4 +1,4 @@
-FROM alpine:3.7
+FROM alpine:3.10
 
 ENV INDEXER_CONFIG_URL=https://raw.githubusercontent.com/projectblacklight/arclight/v0.3.0/lib/arclight/traject/ead2_config.rb \
     OAI_ENDPOINT=https://archivesspace.lyrasistechnology.org/oai \
