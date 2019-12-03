@@ -45,7 +45,8 @@ module OAI
               next
             end
 
-            OAI::Utils.update_eadid(record: record, eadid: identifier)
+            id = "#{repository_id}_#{XXhash.xxh32(identifier)}"
+            OAI::Utils.update_eadid(record: record, eadid: id)
             yield record, repository_id
           rescue StandardError => ex
             logger.error("Error harvesting [#{identifier}]: #{ex.message}")

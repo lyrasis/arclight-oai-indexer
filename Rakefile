@@ -12,6 +12,7 @@ require 'rsolr'
 require 'tmpdir'
 require 'uri'
 require 'yaml'
+require 'xxhash'
 
 Dir.glob('lib/*/*.rb').each { |r| require_relative r }
 Dir.glob('lib/tasks/*.rake').each { |r| load r }

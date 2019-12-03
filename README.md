@@ -4,10 +4,11 @@
 
 Ingest OAI EAD documents into Solr using the ArcLight Indexer.
 
-**Notes:**
+**Change Log:**
 
 - `v0.1.0` `REPOSITORY_URL` is required.
 - `v0.2.0+` requires ArcLight `v0.3.0` and uses Traject for indexing.
+- `v0.3.0` uses repository id + hash of oai identifier for replacement eadid.
 
 ## Getting started
 
@@ -42,6 +43,7 @@ lyrasis_special_collections:
   phone: ""
   contact_info: ""
   thumbnail_url: "https://s3-us-west-2.amazonaws.com/as-public-shared-files/dts/dts.logo.png"
+  visit_note: ""
 ```
 
 The `identifier_prefix` is used for record filtering, and in some cases provides
@@ -109,6 +111,7 @@ See the `docker-compose.yml` for example configuration.
 ```bash
 # these values should be set in `.env.local`
 OAI_ENDPOINT=https://archives.example.org/oai
+REPOSITORY_URL=https://archives.example.org/repositories.yml
 SOLR_URL=http://solr.example.org:8983/solr/arclight
 bundle exec rake arclight:index:oai
 ```
@@ -118,23 +121,12 @@ Or, with Docker:
 ```bash
 docker run -it --rm \
   -e OAI_ENDPOINT=https://archives.example.org/oai \
+  -e REPOSITORY_URL=https://archives.example.org/repositories.yml \
   -e SOLR_URL=http://solr.example.org:8983/solr/arclight \
   arclight/indexer
 ```
 
 The container must be able to access the oai and solr urls.
-
-## ArcLight
-
-To test with a local ArcLight download it then start Solr and:
-
-```bash
-bundle install
-bundle exec rake arclight:generate
-cd .internal_test_app
-# update config/repositories.yml
-SOLR_URL=http://localhost:8983/solr/arclight ./bin/rails s
-```
 
 ## Deployment options
 
