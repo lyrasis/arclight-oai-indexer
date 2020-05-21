@@ -2,7 +2,7 @@
 
 require 'arclight'
 require 'benchmark'
-require 'dotenv/load'
+require 'dotenv'
 require 'fieldhand'
 require 'fileutils'
 require 'http'
@@ -13,6 +13,8 @@ require 'tmpdir'
 require 'uri'
 require 'yaml'
 require 'xxhash'
+
+Dotenv.load('.env.local', '.env')
 
 Dir.glob('lib/*/*.rb').each { |r| require_relative r }
 Dir.glob('lib/tasks/*.rake').each { |r| load r }
