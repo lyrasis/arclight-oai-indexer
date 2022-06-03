@@ -2,7 +2,7 @@
 
 source 'https://rubygems.org'
 
-gem 'arclight'
+gem 'arclight', '0.1.0'
 gem 'dotenv'
 gem 'fieldhand'
 gem 'http'

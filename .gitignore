@@ -1,6 +1,4 @@
 *.bak
 .DS_Store
 .env.local
-*.txt
 downloads/
-*.xml
