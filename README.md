@@ -4,12 +4,6 @@
 
 Ingest OAI EAD documents into Solr using the ArcLight Indexer.
 
-**Change Log:**
-
-- `v0.1.0` `REPOSITORY_URL` is required.
-- `v0.2.0+` requires ArcLight `v0.3.0` and uses Traject for indexing.
-- `v0.3.0` uses repository id + hash of oai identifier for replacement eadid.
-
 ## Getting started
 
 To get up and running quickly there is a prebuilt image on Docker Hub:

@@ -1,6 +1,6 @@
-FROM alpine:3.10
+FROM alpine:3
 
-ENV INDEXER_CONFIG_URL=https://raw.githubusercontent.com/projectblacklight/arclight/v0.3.0/lib/arclight/traject/ead2_config.rb \
+ENV INDEXER_CONFIG_URL=https://raw.githubusercontent.com/projectblacklight/arclight/v0.4.0/lib/arclight/traject/ead2_config.rb \
     OAI_ENDPOINT=https://archivesspace.lyrasistechnology.org/oai \
     PS1="\n\n>> ruby \W \$ " \
     REPOSITORY_URL=https://s3-us-west-2.amazonaws.com/as-public-shared-files/dts/dts.repo.yml \

@@ -1,7 +1,7 @@
-FROM solr:8.2
+FROM solr:8.11
 LABEL maintainer="mark.cooper@lyrasis.org"
 
-ENV ARCLIGHT_VERSION=0.3.0
+ENV ARCLIGHT_VERSION=0.4.0
 
 USER root
 
